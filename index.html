@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SABLE — Creative Agency</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600;1,700&family=Instrument+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="styles.css"/>
+</head>
+<body>
+
+  <!-- ══ FIXED NAV ══ -->
+  <nav id="nav" class="anim-nav">
+    <a href="#" class="wordmark">SABLE</a>
+    <div class="nav-links">
+      <a href="#services" class="nav-pill">Services</a>
+      <a href="#work"     class="nav-pill">Work</a>
+      <a href="#process"  class="nav-pill">Process</a>
+      <a href="#contact"  class="nav-pill">Contact</a>
+    </div>
+    <button class="nav-cta js-open-booking">Book a Call</button>
+  </nav>
+
+  <!-- ══ HERO ══ -->
+  <section id="hero">
+    <!-- background video — never covered by overlay -->
+    <video id="hero-video" autoplay muted loop playsinline poster="">
+      <source src="https://videos.pexels.com/video-files/3571264/3571264-hd_1920_1080_25fps.mp4" type="video/mp4"/>
+    </video>
+    <!-- edge-only vignette keeps video center clear -->
+    <div class="hero-vignette" aria-hidden="true"></div>
+
+    <!-- floating headline -->
+    <div class="hero-headline anim-headline">
+      <h1>Built for brands<br/><em>that refuse</em><br/>to whisper.</h1>
+      <p class="hero-sub">Creative strategy &amp; production for the relentlessly ambitious.</p>
+    </div>
+
+    <!-- CHIP TL: stats -->
+    <aside class="chip chip-tl anim-chip-tl" aria-label="Agency stats">
+      <span class="chip-label">Track record</span>
+      <div class="chip-stats-row">
+        <div class="chip-stat"><span class="chip-num">12</span><span class="chip-unit">yrs</span></div>
+        <div class="chip-stat"><span class="chip-num">240+</span><span class="chip-unit">brands</span></div>
+        <div class="chip-stat"><span class="chip-num">3×</span><span class="chip-unit">Cannes</span></div>
+      </div>
+    </aside>
+
+    <!-- CHIP TR: booking -->
+    <aside class="chip chip-tr anim-chip-tr" aria-label="Book a call">
+      <span class="chip-label">New project?</span>
+      <p class="chip-body">Q3 spots are open. Reach out before they're gone.</p>
+      <button class="chip-btn js-open-booking">Book discovery call →</button>
+    </aside>
+
+    <!-- CHIP BL: services -->
+    <aside class="chip chip-bl anim-chip-bl" aria-label="Services">
+      <span class="chip-label">What we do</span>
+      <ul class="chip-list">
+        <li>Brand Identity</li>
+        <li>Web &amp; Digital</li>
+        <li>Film &amp; Motion</li>
+        <li>Campaign Strategy</li>
+      </ul>
+    </aside>
+
+    <!-- CHIP BR: AI search -->
+    <aside class="chip chip-br anim-chip-br" aria-label="AI-powered search">
+      <span class="chip-label">Ask anything</span>
+      <div class="search-wrap">
+        <input id="ai-search-input" class="search-input" type="text" autocomplete="off" aria-label="Search"/>
+        <button class="search-arrow" id="search-submit" aria-label="Search">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <path d="M1 7h12M7.5 1.5l5.5 5.5-5.5 5.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+      <div class="search-answer" id="search-answer" aria-live="polite"></div>
+    </aside>
+  </section>
+
+  <!-- ══ SERVICES ══ -->
+  <section id="services" class="section-services">
+    <div class="section-header">
+      <span class="section-tag">Our disciplines</span>
+      <h2 class="section-title"><em>What we build</em></h2>
+    </div>
+    <div class="services-grid">
+      <div class="service-card" data-index="0">
+        <span class="service-num">01</span>
+        <h3>Brand Identity</h3>
+        <p>Strategy, naming, visual language, and the full system that makes a company unmistakable across every surface.</p>
+        <a href="#contact" class="card-link">Start a project →</a>
+      </div>
+      <div class="service-card" data-index="1">
+        <span class="service-num">02</span>
+        <h3>Web &amp; Digital</h3>
+        <p>Websites, platforms, and experiences that convert — designed with obsessive craft and engineered to perform.</p>
+        <a href="#contact" class="card-link">Start a project →</a>
+      </div>
+      <div class="service-card" data-index="2">
+        <span class="service-num">03</span>
+        <h3>Film &amp; Motion</h3>
+        <p>Commercials, brand films, and social content that arrest attention and live rent-free in the viewer's memory.</p>
+        <a href="#contact" class="card-link">Start a project →</a>
+      </div>
+      <div class="service-card" data-index="3">
+        <span class="service-num">04</span>
+        <h3>Campaign Strategy</h3>
+        <p>Integrated campaigns with measurable impact — from the big idea to the last touchpoint, all under one roof.</p>
+        <a href="#contact" class="card-link">Start a project →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ SELECTED WORK ══ -->
+  <section id="work" class="section-work">
+    <div class="section-header">
+      <span class="section-tag">Portfolio</span>
+      <h2 class="section-title"><em>Selected work</em></h2>
+    </div>
+    <div class="work-grid">
+      <article class="work-card work-large" style="--c1:#1a0a00;--c2:#3d1500">
+        <div class="work-thumb"></div>
+        <div class="work-info">
+          <span class="work-cat">Brand Identity</span>
+          <h3>Volta Energy</h3>
+          <span class="work-year">2024</span>
+        </div>
+      </article>
+      <article class="work-card" style="--c1:#00101a;--c2:#001d33">
+        <div class="work-thumb"></div>
+        <div class="work-info">
+          <span class="work-cat">Web &amp; Digital</span>
+          <h3>Méridien Hotels</h3>
+          <span class="work-year">2024</span>
+        </div>
+      </article>
+      <article class="work-card" style="--c1:#0d001a;--c2:#1e0035">
+        <div class="work-thumb"></div>
+        <div class="work-info">
+          <span class="work-cat">Film &amp; Motion</span>
+          <h3>Sabre Athletics</h3>
+          <span class="work-year">2023</span>
+        </div>
+      </article>
+      <article class="work-card work-large" style="--c1:#001a08;--c2:#00331a">
+        <div class="work-thumb"></div>
+        <div class="work-info">
+          <span class="work-cat">Full Campaign</span>
+          <h3>Nocturne Spirits</h3>
+          <span class="work-year">2023</span>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- ══ PROCESS ══ -->
+  <section id="process" class="section-process">
+    <div class="section-header">
+      <span class="section-tag">How it works</span>
+      <h2 class="section-title"><em>Our process</em></h2>
+    </div>
+    <div class="process-track">
+      <div class="process-step">
+        <div class="process-marker"><span>01</span></div>
+        <div class="process-content">
+          <h3>Discovery</h3>
+          <p>A 60-minute deep-dive where we interrogate your brand, competitive context, and the gap between where you are and where you want to be.</p>
+        </div>
+      </div>
+      <div class="process-connector" aria-hidden="true"></div>
+      <div class="process-step">
+        <div class="process-marker"><span>02</span></div>
+        <div class="process-content">
+          <h3>Strategy</h3>
+          <p>We distill the discovery into a strategic platform — positioning, messaging, and the creative brief that guides everything downstream.</p>
+        </div>
+      </div>
+      <div class="process-connector" aria-hidden="true"></div>
+      <div class="process-step">
+        <div class="process-marker"><span>03</span></div>
+        <div class="process-content">
+          <h3>Creation</h3>
+          <p>Ideas become artefacts: identities, sites, films, campaigns. Relentless iteration until the work is genuinely exceptional.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ CONTACT ══ -->
+  <section id="contact" class="section-contact">
+    <div class="contact-inner">
+      <div class="contact-left">
+        <span class="section-tag">Get in touch</span>
+        <h2 class="section-title"><em>Let's make<br/>something<br/>unforgettable.</em></h2>
+        <div class="contact-details">
+          <p>hello@sableagency.co</p>
+          <p>London · New York · Tokyo</p>
+        </div>
+      </div>
+      <form class="contact-form" id="contact-form" novalidate>
+        <div class="field-row">
+          <input class="field" type="text" placeholder="Your name" required/>
+          <input class="field" type="email" placeholder="Email address" required/>
+        </div>
+        <input class="field" type="text" placeholder="Company (optional)"/>
+        <textarea class="field field-area" placeholder="Tell us about your project…" rows="4"></textarea>
+        <button type="submit" class="form-submit">Send it →</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- ══ FOOTER ══ -->
+  <footer class="site-footer">
+    <span class="wordmark">SABLE</span>
+    <span>© 2025. All rights reserved.</span>
+    <div class="footer-links">
+      <a href="#">Privacy</a>
+      <a href="#">Instagram</a>
+      <a href="#">LinkedIn</a>
+    </div>
+  </footer>
+
+  <!-- ══ BOOKING MODAL ══ -->
+  <div id="booking-modal" class="modal-overlay" aria-hidden="true" role="dialog" aria-label="Book a discovery call">
+    <div class="modal-card">
+
+      <!-- close -->
+      <button class="modal-close js-close-booking" aria-label="Close">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M2 2l12 12M14 2L2 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </button>
+
+      <!-- step bar -->
+      <div class="modal-steps">
+        <div class="modal-step active" data-step="1"><span class="step-num">1</span><span class="step-lbl">Service</span></div>
+        <div class="step-line"></div>
+        <div class="modal-step" data-step="2"><span class="step-num">2</span><span class="step-lbl">Date &amp; Time</span></div>
+        <div class="step-line"></div>
+        <div class="modal-step" data-step="3"><span class="step-num">3</span><span class="step-lbl">Details</span></div>
+      </div>
+
+      <!-- ── STEP 1 ── -->
+      <div class="step-panel active" id="step-1">
+        <h2 class="modal-title">What are you looking for?</h2>
+        <div class="service-options">
+          <label class="service-option">
+            <input type="radio" name="service" value="brand-identity"/>
+            <span class="option-card"><strong>Brand Identity</strong><small>Naming · Visual language · System</small></span>
+          </label>
+          <label class="service-option">
+            <input type="radio" name="service" value="web-digital"/>
+            <span class="option-card"><strong>Web &amp; Digital</strong><small>Website · Platform · Experience</small></span>
+          </label>
+          <label class="service-option">
+            <input type="radio" name="service" value="film-motion"/>
+            <span class="option-card"><strong>Film &amp; Motion</strong><small>Commercial · Brand film · Social</small></span>
+          </label>
+          <label class="service-option">
+            <input type="radio" name="service" value="full-campaign"/>
+            <span class="option-card"><strong>Full Campaign</strong><small>Strategy · Creative · Execution</small></span>
+          </label>
+        </div>
+        <button class="modal-next js-next-step" disabled>Continue →</button>
+      </div>
+
+      <!-- ── STEP 2 ── -->
+      <div class="step-panel" id="step-2">
+        <h2 class="modal-title">Choose a date &amp; time</h2>
+        <div class="cal-time-wrap">
+          <div class="cal-wrap">
+            <div class="cal-header">
+              <button class="cal-nav" id="cal-prev" aria-label="Previous month">‹</button>
+              <span class="cal-month-lbl" id="cal-month-lbl"></span>
+              <button class="cal-nav" id="cal-next" aria-label="Next month">›</button>
+            </div>
+            <div class="cal-grid-head">
+              <span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span><span>Su</span>
+            </div>
+            <div class="cal-grid" id="cal-grid"></div>
+          </div>
+          <div class="time-wrap" id="time-wrap">
+            <p class="time-prompt">Select a date first</p>
+          </div>
+        </div>
+        <div class="step-nav">
+          <button class="modal-back js-prev-step">← Back</button>
+          <button class="modal-next js-next-step" id="step2-next" disabled>Continue →</button>
+        </div>
+      </div>
+
+      <!-- ── STEP 3 ── -->
+      <div class="step-panel" id="step-3">
+        <h2 class="modal-title">Almost there</h2>
+        <div class="booking-summary" id="booking-summary"></div>
+        <div class="booking-fields">
+          <div class="field-row">
+            <input class="field" id="b-name" type="text" placeholder="Your full name" required/>
+            <input class="field" id="b-company" type="text" placeholder="Company"/>
+          </div>
+          <input class="field" id="b-email" type="email" placeholder="Email address" required/>
+          <textarea class="field field-area" id="b-brief" placeholder="Briefly describe your project…" rows="3"></textarea>
+        </div>
+        <div class="step-nav">
+          <button class="modal-back js-prev-step">← Back</button>
+          <button class="modal-submit js-confirm-booking">Confirm booking →</button>
+        </div>
+        <div class="booking-success" id="booking-success" aria-live="polite">
+          <div class="success-icon">✓</div>
+          <h3>You're booked.</h3>
+          <p>Check your inbox — a calendar invite is on its way.</p>
+          <button class="modal-next js-close-booking">Close</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="main.js"></script>
+</body>
+</html>

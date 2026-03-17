@@ -1,0 +1,13 @@
+{
+  "name": "sable-agency",
+  "version": "1.0.0",
+  "description": "SABLE Creative Agency — static site",
+  "private": true,
+  "scripts": {
+    "start": "npx serve .",
+    "dev":   "npx serve ."
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

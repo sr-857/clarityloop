@@ -1,0 +1,15 @@
+# dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Vercel
+.vercel/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# logs
+*.log
+npm-debug.log*
