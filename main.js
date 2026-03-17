@@ -1,942 +1,953 @@
-/* =============================================
-   CLARITY LOOP — MAIN SCRIPT
-   Three.js Neural Networks + All Interactions
-   ============================================= */
+/* ============================================================
+   CLARITY LOOP — script.js
+   Production-ready · No runtime errors · Full feature set
+   ============================================================ */
 
-'use strict';
+(function () {
+  'use strict';
 
-/* =============================================
-   CURSOR
-   ============================================= */
-const cursor = document.getElementById('cursor');
-const cursorTrail = document.getElementById('cursorTrail');
-let mouseX = -100, mouseY = -100;
-let trailX = -100, trailY = -100;
-
-document.addEventListener('mousemove', (e) => {
-  mouseX = e.clientX;
-  mouseY = e.clientY;
-  cursor.style.left = mouseX + 'px';
-  cursor.style.top = mouseY + 'px';
-});
-
-(function animateTrail() {
-  trailX += (mouseX - trailX) * 0.12;
-  trailY += (mouseY - trailY) * 0.12;
-  cursorTrail.style.left = trailX + 'px';
-  cursorTrail.style.top = trailY + 'px';
-  requestAnimationFrame(animateTrail);
-})();
-
-/* =============================================
-   NAVBAR SCROLL BEHAVIOR
-   ============================================= */
-const navbar = document.getElementById('navbar');
-window.addEventListener('scroll', () => {
-  if (window.scrollY > 60) navbar.classList.add('scrolled');
-  else navbar.classList.remove('scrolled');
-}, { passive: true });
-
-/* ——— Hamburger ——— */
-const hamburger = document.getElementById('hamburger');
-const navLinks = document.getElementById('navLinks');
-hamburger.addEventListener('click', () => {
-  navLinks.classList.toggle('open');
-});
-navLinks.querySelectorAll('.nav-link').forEach(l => {
-  l.addEventListener('click', () => navLinks.classList.remove('open'));
-});
-
-/* =============================================
-   SCROLL REVEAL
-   ============================================= */
-const revealObserver = new IntersectionObserver((entries) => {
-  entries.forEach(e => {
-    if (e.isIntersecting) {
-      e.target.classList.add('revealed');
-    }
-  });
-}, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
-
-document.querySelectorAll('[data-scroll-reveal]').forEach(el => revealObserver.observe(el));
-
-/* =============================================
-   TYPEWRITER ANIMATION
-   ============================================= */
-const queries = [
-  'Explain networking simply',
-  'Summarize this lecture',
-  'Create exam questions',
-  'What is the TCP/IP model?',
-  'Simplify this paragraph',
-  'Generate flashcards'
-];
-
-let qIndex = 0, charIndex = 0, deleting = false;
-const typewriterEl = document.getElementById('typewriterText');
-
-function typewrite() {
-  if (!typewriterEl) return;
-  const current = queries[qIndex];
-  if (!deleting) {
-    typewriterEl.textContent = current.slice(0, ++charIndex);
-    if (charIndex === current.length) {
-      deleting = true;
-      setTimeout(typewrite, 1800);
-      return;
-    }
-  } else {
-    typewriterEl.textContent = current.slice(0, --charIndex);
-    if (charIndex === 0) {
-      deleting = false;
-      qIndex = (qIndex + 1) % queries.length;
-    }
-  }
-  setTimeout(typewrite, deleting ? 45 : 80);
-}
-setTimeout(typewrite, 2000);
-
-/* =============================================
-   THREE.JS — HERO NEURAL NETWORK
-   ============================================= */
-(function initHeroCanvas() {
-  const canvas = document.getElementById('neuralCanvas');
-  if (!canvas || typeof THREE === 'undefined') return;
-
-  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-  renderer.setClearColor(0x000000, 0);
-
-  const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(60, canvas.offsetWidth / canvas.offsetHeight, 0.1, 1000);
-  camera.position.z = 28;
-
-  function resize() {
-    const w = canvas.offsetWidth, h = canvas.offsetHeight;
-    renderer.setSize(w, h, false);
-    camera.aspect = w / h;
-    camera.updateProjectionMatrix();
-  }
-  resize();
-  window.addEventListener('resize', resize);
-
-  const nodeCount = 90;
-  const positions = [];
-  for (let i = 0; i < nodeCount; i++) {
-    positions.push(new THREE.Vector3(
-      (Math.random() - 0.5) * 60,
-      (Math.random() - 0.5) * 40,
-      (Math.random() - 0.5) * 20
-    ));
-  }
-
-  // Nodes
-  const nodeGeo = new THREE.SphereGeometry(0.18, 8, 8);
-  const nodeMat = new THREE.MeshBasicMaterial({ color: 0x8b5cf6 });
-  const nodeMesh = new THREE.InstancedMesh(nodeGeo, nodeMat, nodeCount);
-  const dummy = new THREE.Object3D();
-  positions.forEach((p, i) => {
-    dummy.position.copy(p);
-    dummy.updateMatrix();
-    nodeMesh.setMatrixAt(i, dummy.matrix);
-  });
-  nodeMesh.instanceMatrix.needsUpdate = true;
-  scene.add(nodeMesh);
-
-  // Connections
-  const lineMat = new THREE.LineBasicMaterial({ color: 0x8b5cf6, transparent: true, opacity: 0.18 });
-  const threshold = 12;
-  for (let i = 0; i < nodeCount; i++) {
-    for (let j = i + 1; j < nodeCount; j++) {
-      if (positions[i].distanceTo(positions[j]) < threshold) {
-        const geo = new THREE.BufferGeometry().setFromPoints([positions[i], positions[j]]);
-        scene.add(new THREE.Line(geo, lineMat));
-      }
+  /* ──────────────────────────────────────────────────────────
+     WAIT FOR THREE.JS + DOM
+  ────────────────────────────────────────────────────────── */
+  function onReady(fn) {
+    if (document.readyState !== 'loading') {
+      fn();
+    } else {
+      document.addEventListener('DOMContentLoaded', fn);
     }
   }
 
-  // Particles
-  const pCount = 200;
-  const pGeo = new THREE.BufferGeometry();
-  const pPos = new Float32Array(pCount * 3);
-  for (let i = 0; i < pCount * 3; i++) pPos[i] = (Math.random() - 0.5) * 80;
-  pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
-  const pMat = new THREE.PointsMaterial({ color: 0xa78bfa, size: 0.12, transparent: true, opacity: 0.4 });
-  scene.add(new THREE.Points(pGeo, pMat));
+  function waitForThree(fn, attempts) {
+    attempts = attempts || 0;
+    if (typeof THREE !== 'undefined') {
+      fn();
+    } else if (attempts < 50) {
+      setTimeout(function () { waitForThree(fn, attempts + 1); }, 100);
+    }
+  }
 
-  let t = 0;
-  const nodePhases = positions.map(() => Math.random() * Math.PI * 2);
+  /* ──────────────────────────────────────────────────────────
+     1. CURSOR
+  ────────────────────────────────────────────────────────── */
+  function initCursor() {
+    var dot  = document.getElementById('cl-cursor');
+    var ring = document.getElementById('cl-cursor-ring');
+    if (!dot || !ring) return;
 
-  // Mouse parallax
-  let mx = 0, my = 0;
-  document.addEventListener('mousemove', e => {
-    mx = (e.clientX / window.innerWidth - 0.5) * 2;
-    my = (e.clientY / window.innerHeight - 0.5) * 2;
-  });
+    var mx = -200, my = -200, rx = -200, ry = -200;
+    var bigTargets = 'a, button, [role="button"], label, .chip';
 
-  (function animate() {
-    requestAnimationFrame(animate);
-    t += 0.007;
-
-    positions.forEach((p, i) => {
-      const scale = 0.9 + 0.3 * Math.sin(t + nodePhases[i]);
-      dummy.position.copy(p);
-      dummy.scale.setScalar(scale);
-      dummy.updateMatrix();
-      nodeMesh.setMatrixAt(i, dummy.matrix);
+    document.addEventListener('mousemove', function (e) {
+      mx = e.clientX;
+      my = e.clientY;
+      dot.style.left  = mx + 'px';
+      dot.style.top   = my + 'px';
     });
-    nodeMesh.instanceMatrix.needsUpdate = true;
-    nodeMat.color.setHSL(0.72 + 0.04 * Math.sin(t * 0.3), 0.9, 0.65);
 
-    camera.position.x += (mx * 3 - camera.position.x) * 0.03;
-    camera.position.y += (-my * 2 - camera.position.y) * 0.03;
-    camera.lookAt(0, 0, 0);
-
-    renderer.render(scene, camera);
-  })();
-})();
-
-/* =============================================
-   THREE.JS — BRAIN VISUALIZATION
-   ============================================= */
-(function initBrainCanvas() {
-  const canvas = document.getElementById('brainCanvas');
-  if (!canvas || typeof THREE === 'undefined') return;
-
-  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-  renderer.setClearColor(0x000000, 0);
-
-  const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(60, 2, 0.1, 1000);
-  camera.position.z = 22;
-
-  function resize() {
-    const w = canvas.offsetWidth, h = canvas.offsetHeight;
-    renderer.setSize(w, h, false);
-    camera.aspect = w / h;
-    camera.updateProjectionMatrix();
-  }
-  resize();
-  window.addEventListener('resize', resize);
-
-  // Brain-shaped node cluster
-  const nodeCount = 140;
-  const positions = [];
-  for (let i = 0; i < nodeCount; i++) {
-    const theta = Math.random() * Math.PI * 2;
-    const phi = Math.random() * Math.PI;
-    const r = 6 + (Math.random() - 0.5) * 3;
-    // Flatten into brain shape
-    const x = r * Math.sin(phi) * Math.cos(theta) * 1.4;
-    const y = r * Math.cos(phi) * 0.85 + Math.sin(theta * 2) * 1.2;
-    const z = r * Math.sin(phi) * Math.sin(theta) * 0.7;
-    positions.push(new THREE.Vector3(x, y, z));
-  }
-
-  const nodeGeo = new THREE.SphereGeometry(0.15, 6, 6);
-  const nodeMat = new THREE.MeshBasicMaterial({ color: 0x8b5cf6 });
-  const nodeMesh = new THREE.InstancedMesh(nodeGeo, nodeMat, nodeCount);
-  const dummy = new THREE.Object3D();
-  positions.forEach((p, i) => {
-    dummy.position.copy(p);
-    dummy.updateMatrix();
-    nodeMesh.setMatrixAt(i, dummy.matrix);
-  });
-  nodeMesh.instanceMatrix.needsUpdate = true;
-  scene.add(nodeMesh);
-
-  // Connections
-  const connMat = new THREE.LineBasicMaterial({ color: 0x8b5cf6, transparent: true, opacity: 0.15 });
-  const thresh = 5;
-  for (let i = 0; i < nodeCount; i++) {
-    for (let j = i + 1; j < nodeCount; j++) {
-      if (positions[i].distanceTo(positions[j]) < thresh) {
-        const g = new THREE.BufferGeometry().setFromPoints([positions[i], positions[j]]);
-        scene.add(new THREE.Line(g, connMat));
+    document.addEventListener('mouseover', function (e) {
+      if (e.target.closest(bigTargets)) {
+        dot.style.width    = '18px';
+        dot.style.height   = '18px';
+        dot.style.background = 'var(--accent-lt)';
+        ring.style.width  = '48px';
+        ring.style.height = '48px';
       }
-    }
+    });
+    document.addEventListener('mouseout', function (e) {
+      if (e.target.closest(bigTargets)) {
+        dot.style.width    = '10px';
+        dot.style.height   = '10px';
+        dot.style.background = 'var(--accent)';
+        ring.style.width  = '34px';
+        ring.style.height = '34px';
+      }
+    });
+
+    (function trail() {
+      rx += (mx - rx) * 0.12;
+      ry += (my - ry) * 0.12;
+      ring.style.left = rx + 'px';
+      ring.style.top  = ry + 'px';
+      requestAnimationFrame(trail);
+    })();
   }
 
-  let t = 0;
-  const phases = positions.map(() => Math.random() * Math.PI * 2);
-  let scrollY = 0;
-  window.addEventListener('scroll', () => { scrollY = window.scrollY; }, { passive: true });
+  /* ──────────────────────────────────────────────────────────
+     2. NAVBAR SCROLL + HAMBURGER
+  ────────────────────────────────────────────────────────── */
+  function initNavbar() {
+    var navbar = document.getElementById('navbar');
+    var burger  = document.getElementById('hamburger');
+    var pill    = document.getElementById('navPill');
+    if (!navbar) return;
 
-  (function animate() {
-    requestAnimationFrame(animate);
-    t += 0.01;
-    const scrollFactor = Math.min(scrollY / window.innerHeight, 1);
+    window.addEventListener('scroll', function () {
+      if (window.scrollY > 60) navbar.classList.add('nav-scrolled');
+      else                      navbar.classList.remove('nav-scrolled');
+    }, { passive: true });
 
-    positions.forEach((p, i) => {
-      const activation = scrollFactor > 0.3 ? Math.abs(Math.sin(t * 2 + phases[i])) : 0.6;
-      dummy.position.copy(p);
-      dummy.scale.setScalar(0.7 + 0.6 * activation);
-      dummy.updateMatrix();
-      nodeMesh.setMatrixAt(i, dummy.matrix);
-    });
-    nodeMesh.instanceMatrix.needsUpdate = true;
-
-    const hue = 0.72 + 0.06 * scrollFactor;
-    nodeMat.color.setHSL(hue, 0.9, 0.6 + 0.15 * scrollFactor);
-
-    scene.rotation.y = t * 0.1 + scrollFactor * 0.5;
-    renderer.render(scene, camera);
-  })();
-})();
-
-/* =============================================
-   THREE.JS — MINI NEURAL (SCENE 2)
-   ============================================= */
-(function initMiniCanvas() {
-  const canvas = document.getElementById('miniNeuralCanvas');
-  if (!canvas || typeof THREE === 'undefined') return;
-
-  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-  renderer.setClearColor(0x000000, 0);
-
-  const scene = new THREE.Scene();
-  const w = canvas.offsetWidth || 400, h = canvas.offsetHeight || 220;
-  const camera = new THREE.PerspectiveCamera(60, w / h, 0.1, 100);
-  camera.position.z = 12;
-  renderer.setSize(w, h, false);
-
-  const nodeGeo = new THREE.SphereGeometry(0.2, 6, 6);
-  const nodeMat = new THREE.MeshBasicMaterial({ color: 0x22d3ee });
-  const layers = [3, 5, 5, 3];
-  const nodePositions = [];
-
-  layers.forEach((count, li) => {
-    for (let n = 0; n < count; n++) {
-      const x = (li - 1.5) * 3.5;
-      const y = (n - (count - 1) / 2) * 1.8;
-      const pos = new THREE.Vector3(x, y, 0);
-      nodePositions.push(pos);
-      const mesh = new THREE.Mesh(nodeGeo, nodeMat.clone());
-      mesh.position.copy(pos);
-      scene.add(mesh);
-    }
-  });
-
-  // Connect layers
-  const lineMat = new THREE.LineBasicMaterial({ color: 0x22d3ee, transparent: true, opacity: 0.2 });
-  let offset = 0;
-  for (let li = 0; li < layers.length - 1; li++) {
-    const thisLayer = nodePositions.slice(offset, offset + layers[li]);
-    const nextLayer = nodePositions.slice(offset + layers[li], offset + layers[li] + layers[li + 1]);
-    thisLayer.forEach(a => {
-      nextLayer.forEach(b => {
-        const g = new THREE.BufferGeometry().setFromPoints([a, b]);
-        scene.add(new THREE.Line(g, lineMat));
+    if (burger && pill) {
+      burger.addEventListener('click', function () {
+        var open = pill.classList.toggle('nav-open');
+        burger.classList.toggle('open', open);
+        burger.setAttribute('aria-expanded', open ? 'true' : 'false');
       });
-    });
-    offset += layers[li];
-  }
-
-  let t = 0;
-  (function animate() {
-    requestAnimationFrame(animate);
-    t += 0.02;
-    scene.rotation.y = Math.sin(t * 0.3) * 0.3;
-    renderer.render(scene, camera);
-  })();
-})();
-
-/* =============================================
-   THREE.JS — KNOWLEDGE GALAXY
-   ============================================= */
-(function initGalaxy() {
-  const canvas = document.getElementById('galaxyCanvas');
-  if (!canvas || typeof THREE === 'undefined') return;
-
-  const tooltip = document.getElementById('galaxyTooltip');
-
-  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-  renderer.setClearColor(0x000000, 0);
-
-  const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(55, 2, 0.1, 1000);
-  camera.position.z = 30;
-
-  function resize() {
-    const w = canvas.offsetWidth, h = canvas.offsetHeight;
-    renderer.setSize(w, h, false);
-    camera.aspect = w / h;
-    camera.updateProjectionMatrix();
-  }
-  resize();
-  window.addEventListener('resize', resize);
-
-  const topics = [
-    { name: 'Networking', desc: 'Data communication between devices', x: 0, y: 0, z: 0, color: 0x8b5cf6, size: 0.7 },
-    { name: 'DNS', desc: 'Domain name resolution system', x: 4, y: 2, z: 1, color: 0xa78bfa, size: 0.4 },
-    { name: 'TCP/IP', desc: 'Core internet protocol suite', x: -4, y: 2, z: -1, color: 0x7c3aed, size: 0.45 },
-    { name: 'Routing', desc: 'Path selection in networks', x: 2, y: -3, z: 2, color: 0x9f7aea, size: 0.4 },
-    { name: 'Security', desc: 'Protecting networked systems', x: -2, y: -3, z: -2, color: 0x22d3ee, size: 0.5 },
-    { name: 'AI / ML', desc: 'Machine learning algorithms', x: 10, y: 1, z: 3, color: 0x06b6d4, size: 0.65 },
-    { name: 'Neural Nets', desc: 'Deep learning architectures', x: 13, y: 4, z: 1, color: 0x22d3ee, size: 0.38 },
-    { name: 'Python', desc: 'Programming for data science', x: 13, y: -2, z: -1, color: 0x0ea5e9, size: 0.4 },
-    { name: 'Mathematics', desc: 'Foundations of computation', x: -10, y: 0, z: -2, color: 0xf59e0b, size: 0.6 },
-    { name: 'Calculus', desc: 'Continuous change analysis', x: -13, y: 3, z: 1, color: 0xfbbf24, size: 0.35 },
-    { name: 'Linear Algebra', desc: 'Vectors and transformations', x: -13, y: -3, z: -1, color: 0xf59e0b, size: 0.35 },
-    { name: 'Cybersecurity', desc: 'Digital threat defense', x: 0, y: -8, z: 3, color: 0xef4444, size: 0.55 },
-    { name: 'Encryption', desc: 'Securing data transmission', x: -3, y: -11, z: 1, color: 0xf87171, size: 0.38 },
-    { name: 'Firewalls', desc: 'Network access control', x: 3, y: -11, z: -1, color: 0xef4444, size: 0.38 },
-  ];
-
-  const meshes = [];
-
-  topics.forEach(topic => {
-    const geo = new THREE.SphereGeometry(topic.size, 16, 16);
-    const mat = new THREE.MeshBasicMaterial({ color: topic.color });
-    const mesh = new THREE.Mesh(geo, mat);
-    mesh.position.set(topic.x, topic.y, topic.z);
-    mesh.userData = topic;
-    scene.add(mesh);
-    meshes.push(mesh);
-
-    // Glow ring
-    const ringGeo = new THREE.RingGeometry(topic.size + 0.15, topic.size + 0.35, 32);
-    const ringMat = new THREE.MeshBasicMaterial({ color: topic.color, transparent: true, opacity: 0.15, side: THREE.DoubleSide });
-    const ring = new THREE.Mesh(ringGeo, ringMat);
-    ring.position.copy(mesh.position);
-    scene.add(ring);
-  });
-
-  // Connections between related topics
-  const connections = [[0,1],[0,2],[0,3],[0,4],[1,2],[3,4],[5,6],[5,7],[8,9],[8,10],[11,12],[11,13],[4,11],[5,8]];
-  connections.forEach(([a, b]) => {
-    const mat = new THREE.LineBasicMaterial({
-      color: topics[a].color,
-      transparent: true,
-      opacity: 0.12
-    });
-    const geo = new THREE.BufferGeometry().setFromPoints([
-      new THREE.Vector3(topics[a].x, topics[a].y, topics[a].z),
-      new THREE.Vector3(topics[b].x, topics[b].y, topics[b].z)
-    ]);
-    scene.add(new THREE.Line(geo, mat));
-  });
-
-  // Stars background
-  const starsGeo = new THREE.BufferGeometry();
-  const starsPos = new Float32Array(800 * 3);
-  for (let i = 0; i < 800 * 3; i++) starsPos[i] = (Math.random() - 0.5) * 200;
-  starsGeo.setAttribute('position', new THREE.BufferAttribute(starsPos, 3));
-  const starsMat = new THREE.PointsMaterial({ color: 0x8b5cf6, size: 0.08, transparent: true, opacity: 0.3 });
-  scene.add(new THREE.Points(starsGeo, starsMat));
-
-  // Raycaster for hover
-  const raycaster = new THREE.Raycaster();
-  const mouse = new THREE.Vector2(-10, -10);
-  let hoveredMesh = null;
-
-  canvas.addEventListener('mousemove', e => {
-    const rect = canvas.getBoundingClientRect();
-    mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-    mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
-    tooltipMouseX = e.clientX;
-    tooltipMouseY = e.clientY;
-  });
-
-  let tooltipMouseX = 0, tooltipMouseY = 0;
-
-  // Mouse parallax
-  let gMx = 0, gMy = 0;
-  canvas.addEventListener('mousemove', e => {
-    const rect = canvas.getBoundingClientRect();
-    gMx = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
-    gMy = ((e.clientY - rect.top) / rect.height - 0.5) * 2;
-  });
-
-  let t = 0;
-  (function animate() {
-    requestAnimationFrame(animate);
-    t += 0.005;
-
-    scene.rotation.y = t * 0.15 + gMx * 0.3;
-    scene.rotation.x = gMy * 0.15;
-
-    // Raycasting
-    raycaster.setFromCamera(mouse, camera);
-    const intersects = raycaster.intersectObjects(meshes);
-
-    if (intersects.length > 0) {
-      const hit = intersects[0].object;
-      if (hit !== hoveredMesh) {
-        if (hoveredMesh) hoveredMesh.scale.setScalar(1);
-        hoveredMesh = hit;
-        hit.scale.setScalar(1.4);
-      }
-      const data = hit.userData;
-      tooltip.querySelector('.tooltip-title').textContent = data.name;
-      tooltip.querySelector('.tooltip-desc').textContent = data.desc;
-      tooltip.style.left = (tooltipMouseX + 16) + 'px';
-      tooltip.style.top = (tooltipMouseY - 40) + 'px';
-      tooltip.classList.add('visible');
-    } else {
-      if (hoveredMesh) { hoveredMesh.scale.setScalar(1); hoveredMesh = null; }
-      tooltip.classList.remove('visible');
+      pill.querySelectorAll('.nav-link').forEach(function (l) {
+        l.addEventListener('click', function () {
+          pill.classList.remove('nav-open');
+          burger.classList.remove('open');
+          burger.setAttribute('aria-expanded', 'false');
+        });
+      });
     }
 
-    renderer.render(scene, camera);
-  })();
-})();
-
-/* =============================================
-   THREE.JS — VISION CANVAS (BACKGROUND)
-   ============================================= */
-(function initVisionCanvas() {
-  const canvas = document.getElementById('visionCanvas');
-  if (!canvas || typeof THREE === 'undefined') return;
-
-  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-  renderer.setClearColor(0x000000, 0);
-
-  const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(60, 2, 0.1, 500);
-  camera.position.z = 20;
-
-  function resize() {
-    const w = canvas.offsetWidth, h = canvas.offsetHeight;
-    renderer.setSize(w, h, false);
-    camera.aspect = w / h;
-    camera.updateProjectionMatrix();
-  }
-  resize();
-  window.addEventListener('resize', resize);
-
-  // Abstract neural patterns
-  const nodeCount = 50;
-  const positions = [];
-  for (let i = 0; i < nodeCount; i++) {
-    positions.push(new THREE.Vector3(
-      (Math.random() - 0.5) * 50,
-      (Math.random() - 0.5) * 30,
-      (Math.random() - 0.5) * 10
-    ));
-  }
-
-  const nodeGeo = new THREE.SphereGeometry(0.12, 6, 6);
-  const nodeMat = new THREE.MeshBasicMaterial({ color: 0x8b5cf6, transparent: true, opacity: 0.4 });
-  const nodeMesh = new THREE.InstancedMesh(nodeGeo, nodeMat, nodeCount);
-  const dummy = new THREE.Object3D();
-  positions.forEach((p, i) => {
-    dummy.position.copy(p);
-    dummy.updateMatrix();
-    nodeMesh.setMatrixAt(i, dummy.matrix);
-  });
-  nodeMesh.instanceMatrix.needsUpdate = true;
-  scene.add(nodeMesh);
-
-  const lineMat = new THREE.LineBasicMaterial({ color: 0x8b5cf6, transparent: true, opacity: 0.08 });
-  const thresh = 14;
-  for (let i = 0; i < nodeCount; i++) {
-    for (let j = i + 1; j < nodeCount; j++) {
-      if (positions[i].distanceTo(positions[j]) < thresh) {
-        const g = new THREE.BufferGeometry().setFromPoints([positions[i], positions[j]]);
-        scene.add(new THREE.Line(g, lineMat));
-      }
-    }
-  }
-
-  let t = 0;
-  const phases = positions.map(() => Math.random() * Math.PI * 2);
-
-  (function animate() {
-    requestAnimationFrame(animate);
-    t += 0.005;
-    scene.rotation.z = t * 0.02;
-    positions.forEach((p, i) => {
-      const s = 0.8 + 0.4 * Math.abs(Math.sin(t + phases[i]));
-      dummy.position.copy(p);
-      dummy.scale.setScalar(s);
-      dummy.updateMatrix();
-      nodeMesh.setMatrixAt(i, dummy.matrix);
-    });
-    nodeMesh.instanceMatrix.needsUpdate = true;
-    renderer.render(scene, camera);
-  })();
-})();
-
-/* =============================================
-   CINEMATIC SCROLL SCENES
-   ============================================= */
-(function initCinematic() {
-  const section = document.querySelector('.cinematic-section');
-  if (!section) return;
-
-  const scenes = [
-    document.getElementById('scene1'),
-    document.getElementById('scene2'),
-    document.getElementById('scene3'),
-    document.getElementById('scene4')
-  ].filter(Boolean);
-
-  const progressItems = document.querySelectorAll('.progress-item');
-
-  function activateScene(index) {
-    scenes.forEach((s, i) => {
-      s.classList.toggle('active', i === index);
-    });
-    progressItems.forEach((p, i) => {
-      p.classList.toggle('active', i === index);
-    });
-  }
-
-  // Mobile: just show all scenes stacked
-  if (window.innerWidth <= 600) {
-    scenes.forEach(s => s.classList.add('active'));
-    return;
-  }
-
-  window.addEventListener('scroll', () => {
-    const rect = section.getBoundingClientRect();
-    const sectionTop = -rect.top;
-    const sectionHeight = section.offsetHeight - window.innerHeight;
-    const progress = Math.max(0, Math.min(1, sectionTop / sectionHeight));
-
-    const sceneIndex = Math.min(Math.floor(progress * scenes.length), scenes.length - 1);
-    activateScene(sceneIndex);
-  }, { passive: true });
-
-  // Click progress dots
-  progressItems.forEach((p, i) => {
-    p.addEventListener('click', () => {
-      const sectionTop = section.offsetTop;
-      const sectionHeight = section.offsetHeight - window.innerHeight;
-      const targetScroll = sectionTop + (i / scenes.length) * sectionHeight;
-      window.scrollTo({ top: targetScroll, behavior: 'smooth' });
-    });
-  });
-})();
-
-/* =============================================
-   AI WORKSPACE — CHAT SIMULATION
-   ============================================= */
-(function initWorkspaceChat() {
-  const input = document.getElementById('chatInput');
-  const send = document.getElementById('chatSend');
-  const messages = document.getElementById('chatMessages');
-  const typingMsg = document.getElementById('typingMsg');
-
-  const responses = [
-    "DNS stands for Domain Name System. Think of it as a phonebook — you look up a name (like google.com) and get a number (IP address) back.",
-    "Great question! The TCP/IP model has 4 layers: Application, Transport, Internet, and Network Access. Each handles a different part of communication.",
-    "Encryption transforms readable data into coded text using mathematical algorithms. Only someone with the correct key can decode it.",
-    "A firewall monitors and controls network traffic based on security rules — like a security guard at a building entrance.",
-    "I've analyzed your question. Let me break this down into the simplest possible explanation..."
-  ];
-
-  let rIndex = 0;
-
-  function addMessage(text, isUser) {
-    const div = document.createElement('div');
-    div.className = `chat-msg ${isUser ? 'user-msg' : 'ai-msg'}`;
-    if (!isUser) {
-      div.innerHTML = `<div class="msg-avatar">◎</div><div class="msg-bubble">${text}</div>`;
-    } else {
-      div.innerHTML = `<div class="msg-bubble">${text}</div>`;
-    }
-    messages.insertBefore(div, typingMsg);
-    messages.scrollTop = messages.scrollHeight;
-  }
-
-  function sendMessage() {
-    const text = input.value.trim();
-    if (!text) return;
-    addMessage(text, true);
-    input.value = '';
-
-    typingMsg.style.display = 'flex';
-    messages.scrollTop = messages.scrollHeight;
-
-    setTimeout(() => {
-      typingMsg.style.display = 'none';
-      addMessage(responses[rIndex % responses.length], false);
-      rIndex++;
-    }, 1800);
-  }
-
-  if (send) send.addEventListener('click', sendMessage);
-  if (input) input.addEventListener('keypress', e => e.key === 'Enter' && sendMessage());
-})();
-
-/* =============================================
-   BOOKING MODAL SYSTEM
-   ============================================= */
-(function initModal() {
-  const overlay = document.getElementById('modalOverlay');
-  const modal = document.getElementById('modal');
-
-  // Triggers
-  const triggers = ['openModal', 'openModalChip', 'openModalHero', 'openModalVision'];
-  triggers.forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.addEventListener('click', openModal);
-  });
-
-  function openModal() {
-    overlay.classList.add('open');
-    document.body.style.overflow = 'hidden';
-    showStep(1);
-  }
-
-  function closeModal() {
-    overlay.classList.remove('open');
-    document.body.style.overflow = '';
-    // Reset state
-    setTimeout(resetModal, 400);
-  }
-
-  document.getElementById('modalClose').addEventListener('click', closeModal);
-  overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(); });
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
-
-  function showStep(n) {
-    ['step1','step2','step3','stepConfirm'].forEach(id => {
-      document.getElementById(id).classList.add('hidden');
-    });
-    document.getElementById('step' + n).classList.remove('hidden');
-  }
-
-  // ——— Step 1: Service Selection ———
-  let selectedService = null;
-  const step1Next = document.getElementById('step1Next');
-
-  document.querySelectorAll('.service-option').forEach(opt => {
-    opt.addEventListener('click', () => {
-      document.querySelectorAll('.service-option').forEach(o => o.classList.remove('selected'));
-      opt.classList.add('selected');
-      selectedService = opt.dataset.service;
-      step1Next.disabled = false;
-      step1Next.style.opacity = '1';
-    });
-  });
-
-  step1Next.addEventListener('click', () => {
-    if (!selectedService) return;
-    showStep(2);
-    buildCalendar();
-  });
-
-  // ——— Step 2: Calendar ———
-  let selectedDate = null;
-  const step2Next = document.getElementById('step2Next');
-
-  function buildCalendar() {
-    const cal = document.getElementById('calendar');
-    const now = new Date();
-    const month = now.getMonth();
-    const year = now.getFullYear();
-
-    const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-    const dayNames = ['Su','Mo','Tu','We','Th','Fr','Sa'];
-
-    const firstDay = new Date(year, month, 1).getDay();
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
-
-    cal.innerHTML = `
-      <div class="calendar-header">
-        <span>${monthNames[month]} ${year}</span>
-      </div>
-      <div class="calendar-grid">
-        ${dayNames.map(d => `<div class="cal-day-name">${d}</div>`).join('')}
-        ${Array(firstDay).fill('<div></div>').join('')}
-        ${Array.from({length: daysInMonth}, (_, i) => {
-          const day = i + 1;
-          const isPast = day < now.getDate();
-          const isToday = day === now.getDate();
-          const classes = ['cal-day', isPast ? 'disabled' : '', isToday ? 'today' : ''].join(' ').trim();
-          return `<div class="${classes}" data-day="${day}">${day}</div>`;
-        }).join('')}
-      </div>`;
-
-    cal.querySelectorAll('.cal-day:not(.disabled)').forEach(d => {
-      d.addEventListener('click', () => {
-        cal.querySelectorAll('.cal-day').forEach(x => x.classList.remove('selected'));
-        d.classList.add('selected');
-        selectedDate = parseInt(d.dataset.day);
-        step2Next.disabled = false;
-        step2Next.style.opacity = '1';
+    // Smooth anchor scroll
+    document.querySelectorAll('a[href^="#"]').forEach(function (a) {
+      a.addEventListener('click', function (e) {
+        var target = document.querySelector(a.getAttribute('href'));
+        if (target) {
+          e.preventDefault();
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
       });
     });
   }
 
-  document.getElementById('step2Back').addEventListener('click', () => showStep(1));
-  step2Next.addEventListener('click', () => {
-    if (!selectedDate) return;
-    const now = new Date();
-    document.getElementById('selectedDateLabel').textContent =
-      `${['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][new Date(now.getFullYear(), now.getMonth(), selectedDate).getDay()]}, ${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][now.getMonth()]} ${selectedDate}`;
-    showStep(3);
-  });
+  /* ──────────────────────────────────────────────────────────
+     3. SCROLL REVEAL
+  ────────────────────────────────────────────────────────── */
+  function initScrollReveal() {
+    var els = document.querySelectorAll('[data-sr]');
+    if (!els.length) return;
 
-  // ——— Step 3: Time Slots ———
-  let selectedTime = null;
-  const step3Confirm = document.getElementById('step3Confirm');
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) {
+          e.target.classList.add('sr-visible');
+          io.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -30px 0px' });
 
-  document.querySelectorAll('.time-slot').forEach(slot => {
-    slot.addEventListener('click', () => {
-      document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('selected'));
-      slot.classList.add('selected');
-      selectedTime = slot.dataset.time;
-      step3Confirm.disabled = false;
-      step3Confirm.style.opacity = '1';
+    els.forEach(function (el, i) {
+      el.style.transitionDelay = (i % 4) * 0.1 + 's';
+      io.observe(el);
     });
-  });
-
-  document.getElementById('step3Back').addEventListener('click', () => showStep(2));
-
-  step3Confirm.addEventListener('click', () => {
-    if (!selectedTime) return;
-
-    const serviceNames = { study: 'AI Study Session', concept: 'Concept Explanation', exam: 'Exam Preparation' };
-    const now = new Date();
-    const dateStr = `${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][now.getMonth()]} ${selectedDate}, ${now.getFullYear()}`;
-
-    document.getElementById('confirmDetails').innerHTML = `
-      <span><span>Service</span><strong>${serviceNames[selectedService]}</strong></span>
-      <span><span>Date</span><strong>${dateStr}</strong></span>
-      <span><span>Time</span><strong>${selectedTime}</strong></span>
-    `;
-
-    document.getElementById('stepConfirm').classList.remove('hidden');
-    ['step1','step2','step3'].forEach(id => document.getElementById(id).classList.add('hidden'));
-  });
-
-  document.getElementById('modalDone').addEventListener('click', closeModal);
-
-  function resetModal() {
-    selectedService = null;
-    selectedDate = null;
-    selectedTime = null;
-
-    step1Next.disabled = true;
-    step2Next.disabled = true;
-    step3Confirm.disabled = true;
-
-    document.querySelectorAll('.service-option').forEach(o => o.classList.remove('selected'));
-    document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('selected'));
   }
-})();
 
-/* =============================================
-   GLOW HOVER EFFECTS
-   ============================================= */
-document.querySelectorAll('.glass-card, .impact-card, .service-option').forEach(card => {
-  card.addEventListener('mousemove', e => {
-    const rect = card.getBoundingClientRect();
-    const x = ((e.clientX - rect.left) / rect.width) * 100;
-    const y = ((e.clientY - rect.top) / rect.height) * 100;
-    card.style.background = `radial-gradient(circle at ${x}% ${y}%, rgba(139,92,246,0.06), rgba(20,20,20,0.55) 60%)`;
-  });
-  card.addEventListener('mouseleave', () => {
-    card.style.background = '';
-  });
-});
+  /* ──────────────────────────────────────────────────────────
+     4. TYPEWRITER
+  ────────────────────────────────────────────────────────── */
+  function initTypewriter() {
+    var el = document.getElementById('typewriter-el');
+    if (!el) return;
 
-/* =============================================
-   UPLOAD ZONE DRAG FEEDBACK
-   ============================================= */
-(function initUpload() {
-  const zone = document.getElementById('uploadZone');
-  if (!zone) return;
+    var queries = [
+      'Explain networking simply',
+      'Summarize this lecture',
+      'Create exam questions',
+      'What is the TCP/IP model?',
+      'Simplify this concept',
+      'Generate flashcards'
+    ];
 
-  ['dragenter', 'dragover'].forEach(e => {
-    zone.addEventListener(e, ev => {
-      ev.preventDefault();
-      zone.style.borderColor = 'rgba(139,92,246,0.6)';
-      zone.style.background = 'rgba(139,92,246,0.08)';
-    });
-  });
+    var qi = 0, ci = 0, del = false;
 
-  ['dragleave', 'drop'].forEach(e => {
-    zone.addEventListener(e, ev => {
-      ev.preventDefault();
-      zone.style.borderColor = '';
-      zone.style.background = '';
-    });
-  });
-
-  zone.addEventListener('drop', e => {
-    e.preventDefault();
-    const files = e.dataTransfer.files;
-    if (files.length > 0) {
-      const icon = zone.querySelector('.upload-icon');
-      const text = zone.querySelector('p');
-      if (icon) icon.textContent = '✓';
-      if (text) text.innerHTML = `<span style="color:#8b5cf6;font-weight:600">${files[0].name}</span> ready to analyze`;
+    function tick() {
+      var cur = queries[qi];
+      if (!del) {
+        el.textContent = cur.slice(0, ++ci);
+        if (ci === cur.length) { del = true; setTimeout(tick, 1800); return; }
+      } else {
+        el.textContent = cur.slice(0, --ci);
+        if (ci === 0) { del = false; qi = (qi + 1) % queries.length; }
+      }
+      setTimeout(tick, del ? 44 : 78);
     }
-  });
-})();
 
-/* =============================================
-   PARALLAX ON HERO TEXT
-   ============================================= */
-(function initParallax() {
-  const heroContent = document.querySelector('.hero-content');
-  if (!heroContent) return;
+    setTimeout(tick, 2200);
+  }
 
-  window.addEventListener('scroll', () => {
-    const scrolled = window.scrollY;
-    const rate = scrolled * 0.3;
-    heroContent.style.transform = `translateY(${rate}px)`;
-    heroContent.style.opacity = Math.max(0, 1 - scrolled / 600);
-  }, { passive: true });
-})();
+  /* ──────────────────────────────────────────────────────────
+     HELPER — build a Three.js renderer bound to a canvas
+     Returns { renderer, scene, camera } or null on failure
+  ────────────────────────────────────────────────────────── */
+  function buildRenderer(canvasId, fov) {
+    var canvas = document.getElementById(canvasId);
+    if (!canvas) return null;
 
-/* =============================================
-   ANIMATED GRADIENT BORDER (ACCENT CARDS)
-   ============================================= */
-(function initGradientBorders() {
-  let angle = 0;
-  const cards = document.querySelectorAll('.impact-card.featured');
+    var renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setClearColor(0x000000, 0);
 
-  (function animate() {
-    requestAnimationFrame(animate);
-    angle = (angle + 0.5) % 360;
-    cards.forEach(card => {
-      card.style.borderImage = `linear-gradient(${angle}deg, rgba(139,92,246,0.6), rgba(34,211,238,0.3), rgba(139,92,246,0.6)) 1`;
+    var scene  = new THREE.Scene();
+    var aspect = canvas.clientWidth / (canvas.clientHeight || 1);
+    var camera = new THREE.PerspectiveCamera(fov || 60, aspect, 0.1, 1000);
+
+    function resize() {
+      var w = canvas.clientWidth;
+      var h = canvas.clientHeight || 400;
+      renderer.setSize(w, h, false);
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+    }
+    resize();
+    window.addEventListener('resize', resize, { passive: true });
+
+    return { renderer: renderer, scene: scene, camera: camera, canvas: canvas, resize: resize };
+  }
+
+  /* ──────────────────────────────────────────────────────────
+     5. THREE.JS — HERO NEURAL NETWORK
+  ────────────────────────────────────────────────────────── */
+  function initHeroCanvas() {
+    var r = buildRenderer('canvas-hero', 60);
+    if (!r) return;
+    r.camera.position.z = 28;
+
+    var COUNT = 80;
+    var positions = [];
+    for (var i = 0; i < COUNT; i++) {
+      positions.push(new THREE.Vector3(
+        (Math.random() - 0.5) * 60,
+        (Math.random() - 0.5) * 38,
+        (Math.random() - 0.5) * 18
+      ));
+    }
+
+    // Instanced nodes
+    var nodeGeo = new THREE.SphereGeometry(0.2, 7, 7);
+    var nodeMat = new THREE.MeshBasicMaterial({ color: 0x8b5cf6 });
+    var nodes   = new THREE.InstancedMesh(nodeGeo, nodeMat, COUNT);
+    var dummy   = new THREE.Object3D();
+    positions.forEach(function (p, i) {
+      dummy.position.copy(p);
+      dummy.updateMatrix();
+      nodes.setMatrixAt(i, dummy.matrix);
     });
-  })();
-})();
+    nodes.instanceMatrix.needsUpdate = true;
+    r.scene.add(nodes);
 
-/* =============================================
-   SMOOTH SECTION TRANSITIONS ON NAV CLICK
-   ============================================= */
-document.querySelectorAll('a[href^="#"]').forEach(link => {
-  link.addEventListener('click', e => {
-    const target = document.querySelector(link.getAttribute('href'));
-    if (target) {
+    // Connections
+    var lineMat = new THREE.LineBasicMaterial({ color: 0x8b5cf6, transparent: true, opacity: 0.16 });
+    var thresh  = 13;
+    for (var a = 0; a < COUNT; a++) {
+      for (var b = a + 1; b < COUNT; b++) {
+        if (positions[a].distanceTo(positions[b]) < thresh) {
+          var g = new THREE.BufferGeometry().setFromPoints([positions[a], positions[b]]);
+          r.scene.add(new THREE.Line(g, lineMat));
+        }
+      }
+    }
+
+    // Particles
+    var pCount = 180;
+    var pPos   = new Float32Array(pCount * 3);
+    for (var k = 0; k < pCount * 3; k++) pPos[k] = (Math.random() - 0.5) * 90;
+    var pGeo = new THREE.BufferGeometry();
+    pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
+    var pMat = new THREE.PointsMaterial({ color: 0xa78bfa, size: 0.12, transparent: true, opacity: 0.38 });
+    r.scene.add(new THREE.Points(pGeo, pMat));
+
+    var phases = positions.map(function () { return Math.random() * Math.PI * 2; });
+    var t = 0, tmx = 0, tmy = 0;
+
+    document.addEventListener('mousemove', function (e) {
+      tmx = (e.clientX / window.innerWidth  - 0.5) * 2;
+      tmy = (e.clientY / window.innerHeight - 0.5) * 2;
+    });
+
+    (function loop() {
+      requestAnimationFrame(loop);
+      t += 0.006;
+
+      positions.forEach(function (p, i) {
+        var s = 0.85 + 0.35 * Math.sin(t + phases[i]);
+        dummy.position.copy(p);
+        dummy.scale.setScalar(s);
+        dummy.updateMatrix();
+        nodes.setMatrixAt(i, dummy.matrix);
+      });
+      nodes.instanceMatrix.needsUpdate = true;
+      nodeMat.color.setHSL(0.72 + 0.04 * Math.sin(t * 0.25), 0.9, 0.64);
+
+      r.camera.position.x += (tmx * 3.5 - r.camera.position.x) * 0.025;
+      r.camera.position.y += (-tmy * 2.2 - r.camera.position.y) * 0.025;
+      r.camera.lookAt(0, 0, 0);
+
+      r.renderer.render(r.scene, r.camera);
+    })();
+  }
+
+  /* ──────────────────────────────────────────────────────────
+     6. MINI NEURAL CANVAS (process step 2)
+  ────────────────────────────────────────────────────────── */
+  function initMiniCanvas() {
+    var canvas = document.getElementById('canvas-mini');
+    if (!canvas || typeof THREE === 'undefined') return;
+
+    var W = canvas.offsetWidth  || 200;
+    var H = canvas.offsetHeight || 80;
+    var renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setSize(W, H, false);
+    renderer.setClearColor(0x000000, 0);
+
+    var scene  = new THREE.Scene();
+    var camera = new THREE.PerspectiveCamera(60, W / H, 0.1, 100);
+    camera.position.z = 10;
+
+    var layers = [3, 5, 5, 3];
+    var all    = [];
+    var xOffset = 0;
+    var totalW  = (layers.length - 1) * 3;
+
+    layers.forEach(function (count, li) {
+      for (var n = 0; n < count; n++) {
+        var x   = li * 3 - totalW / 2;
+        var y   = (n - (count - 1) / 2) * 1.5;
+        var pos = new THREE.Vector3(x, y, 0);
+        all.push(pos);
+        var m = new THREE.Mesh(
+          new THREE.SphereGeometry(0.18, 7, 7),
+          new THREE.MeshBasicMaterial({ color: 0x22d3ee })
+        );
+        m.position.copy(pos);
+        scene.add(m);
+      }
+    });
+
+    // Connect adjacent layers
+    var offset = 0;
+    layers.forEach(function (count, li) {
+      if (li === layers.length - 1) return;
+      var thisLayer = all.slice(offset, offset + count);
+      var nextLayer = all.slice(offset + count, offset + count + layers[li + 1]);
+      var lm = new THREE.LineBasicMaterial({ color: 0x22d3ee, transparent: true, opacity: 0.18 });
+      thisLayer.forEach(function (a) {
+        nextLayer.forEach(function (b) {
+          scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([a, b]), lm));
+        });
+      });
+      offset += count;
+    });
+
+    var t = 0;
+    (function loop() {
+      requestAnimationFrame(loop);
+      t += 0.018;
+      scene.rotation.y = Math.sin(t * 0.35) * 0.4;
+      renderer.render(scene, camera);
+    })();
+  }
+
+  /* ──────────────────────────────────────────────────────────
+     7. THREE.JS — KNOWLEDGE GALAXY
+  ────────────────────────────────────────────────────────── */
+  function initGalaxy() {
+    var r = buildRenderer('canvas-galaxy', 55);
+    if (!r) return;
+    r.camera.position.z = 32;
+
+    var tooltip = document.getElementById('galaxy-tooltip');
+
+    var topics = [
+      { name: 'Networking',     desc: 'Data communication between devices',    x:  0,   y:  0,   z:  0,  color: 0x8b5cf6, sz: 0.75 },
+      { name: 'DNS',            desc: 'Domain name resolution system',          x:  4.5, y:  2.5, z:  1,  color: 0xa78bfa, sz: 0.45 },
+      { name: 'TCP/IP',         desc: 'Core internet protocol suite',           x: -4.5, y:  2.5, z: -1,  color: 0x7c3aed, sz: 0.48 },
+      { name: 'Routing',        desc: 'Path selection in networks',             x:  2.5, y: -3.5, z:  2,  color: 0x9f7aea, sz: 0.43 },
+      { name: 'Security',       desc: 'Protecting networked systems',           x: -2.5, y: -3.5, z: -2,  color: 0x22d3ee, sz: 0.52 },
+      { name: 'AI / ML',        desc: 'Machine learning algorithms',            x: 11,   y:  0.5, z:  3,  color: 0x06b6d4, sz: 0.68 },
+      { name: 'Neural Nets',    desc: 'Deep learning architectures',            x: 14,   y:  4,   z:  1,  color: 0x22d3ee, sz: 0.40 },
+      { name: 'Python',         desc: 'Programming for data science',           x: 14,   y: -2,   z: -1,  color: 0x0ea5e9, sz: 0.42 },
+      { name: 'Mathematics',    desc: 'Foundations of computation',             x:-11,   y:  0,   z: -2,  color: 0xf59e0b, sz: 0.63 },
+      { name: 'Calculus',       desc: 'Continuous change and derivatives',      x:-14,   y:  3.5, z:  1,  color: 0xfbbf24, sz: 0.38 },
+      { name: 'Linear Algebra', desc: 'Vectors, matrices, transformations',     x:-14,   y: -3.5, z: -1,  color: 0xf59e0b, sz: 0.38 },
+      { name: 'Cybersecurity',  desc: 'Digital threat defence',                 x:  0,   y: -9,   z:  3,  color: 0xef4444, sz: 0.58 },
+      { name: 'Encryption',     desc: 'Securing data transmission',             x: -3,   y:-12,   z:  1,  color: 0xf87171, sz: 0.40 },
+      { name: 'Firewalls',      desc: 'Network access control systems',         x:  3,   y:-12,   z: -1,  color: 0xef4444, sz: 0.40 }
+    ];
+
+    var meshes = [];
+
+    topics.forEach(function (t) {
+      var mesh = new THREE.Mesh(
+        new THREE.SphereGeometry(t.sz, 16, 16),
+        new THREE.MeshBasicMaterial({ color: t.color })
+      );
+      mesh.position.set(t.x, t.y, t.z);
+      mesh.userData = t;
+      r.scene.add(mesh);
+      meshes.push(mesh);
+    });
+
+    // Connections
+    var edges = [[0,1],[0,2],[0,3],[0,4],[1,2],[3,4],[5,6],[5,7],[8,9],[8,10],[11,12],[11,13],[4,11],[5,8]];
+    edges.forEach(function (e) {
+      var a = topics[e[0]], b = topics[e[1]];
+      var lm = new THREE.LineBasicMaterial({ color: a.color, transparent: true, opacity: 0.13 });
+      r.scene.add(new THREE.Line(
+        new THREE.BufferGeometry().setFromPoints([
+          new THREE.Vector3(a.x, a.y, a.z),
+          new THREE.Vector3(b.x, b.y, b.z)
+        ]), lm
+      ));
+    });
+
+    // Starfield
+    var sCount = 700;
+    var sPos   = new Float32Array(sCount * 3);
+    for (var i = 0; i < sCount * 3; i++) sPos[i] = (Math.random() - 0.5) * 220;
+    var sGeo = new THREE.BufferGeometry();
+    sGeo.setAttribute('position', new THREE.BufferAttribute(sPos, 3));
+    r.scene.add(new THREE.Points(sGeo,
+      new THREE.PointsMaterial({ color: 0x8b5cf6, size: 0.09, transparent: true, opacity: 0.28 })));
+
+    // Raycaster
+    var raycaster = new THREE.Raycaster();
+    var mouse     = new THREE.Vector2(-10, -10);
+    var hovered   = null;
+    var ttX = 0, ttY = 0;
+    var gMx = 0, gMy = 0;
+
+    r.canvas.addEventListener('mousemove', function (e) {
+      var rect = r.canvas.getBoundingClientRect();
+      mouse.x = ((e.clientX - rect.left) / rect.width)  * 2 - 1;
+      mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+      ttX = e.clientX;
+      ttY = e.clientY;
+      gMx = mouse.x;
+      gMy = -mouse.y;
+    });
+
+    r.canvas.addEventListener('mouseleave', function () {
+      mouse.set(-10, -10);
+      if (tooltip) { tooltip.classList.remove('tt-visible'); tooltip.setAttribute('aria-hidden', 'true'); }
+      if (hovered) { hovered.scale.setScalar(1); hovered = null; }
+    });
+
+    var t = 0;
+    (function loop() {
+      requestAnimationFrame(loop);
+      t += 0.004;
+
+      r.scene.rotation.y = t * 0.12 + gMx * 0.28;
+      r.scene.rotation.x = gMy * 0.14;
+
+      // Raycasting
+      raycaster.setFromCamera(mouse, r.camera);
+      var hits = raycaster.intersectObjects(meshes);
+      if (hits.length > 0) {
+        var hit = hits[0].object;
+        if (hit !== hovered) {
+          if (hovered) hovered.scale.setScalar(1);
+          hovered = hit;
+          hovered.scale.setScalar(1.5);
+        }
+        if (tooltip) {
+          tooltip.querySelector('.gt-name').textContent = hit.userData.name;
+          tooltip.querySelector('.gt-desc').textContent = hit.userData.desc;
+          tooltip.style.left = (ttX + 16) + 'px';
+          tooltip.style.top  = (ttY - 48) + 'px';
+          tooltip.classList.add('tt-visible');
+          tooltip.removeAttribute('aria-hidden');
+        }
+      } else {
+        if (hovered) { hovered.scale.setScalar(1); hovered = null; }
+        if (tooltip) { tooltip.classList.remove('tt-visible'); tooltip.setAttribute('aria-hidden', 'true'); }
+      }
+
+      r.renderer.render(r.scene, r.camera);
+    })();
+  }
+
+  /* ──────────────────────────────────────────────────────────
+     8. THREE.JS — VISION BACKGROUND
+  ────────────────────────────────────────────────────────── */
+  function initVisionCanvas() {
+    var r = buildRenderer('canvas-vision', 60);
+    if (!r) return;
+    r.camera.position.z = 22;
+
+    var COUNT = 45;
+    var pos   = [];
+    for (var i = 0; i < COUNT; i++) {
+      pos.push(new THREE.Vector3(
+        (Math.random() - 0.5) * 55,
+        (Math.random() - 0.5) * 32,
+        (Math.random() - 0.5) * 12
+      ));
+    }
+
+    var nodeGeo = new THREE.SphereGeometry(0.14, 6, 6);
+    var nodeMat = new THREE.MeshBasicMaterial({ color: 0x8b5cf6, transparent: true, opacity: 0.45 });
+    var nodes   = new THREE.InstancedMesh(nodeGeo, nodeMat, COUNT);
+    var dummy   = new THREE.Object3D();
+    pos.forEach(function (p, i) {
+      dummy.position.copy(p);
+      dummy.updateMatrix();
+      nodes.setMatrixAt(i, dummy.matrix);
+    });
+    nodes.instanceMatrix.needsUpdate = true;
+    r.scene.add(nodes);
+
+    var lm = new THREE.LineBasicMaterial({ color: 0x8b5cf6, transparent: true, opacity: 0.07 });
+    for (var a = 0; a < COUNT; a++) {
+      for (var b = a + 1; b < COUNT; b++) {
+        if (pos[a].distanceTo(pos[b]) < 15) {
+          r.scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([pos[a], pos[b]]), lm));
+        }
+      }
+    }
+
+    var phases = pos.map(function () { return Math.random() * Math.PI * 2; });
+    var t = 0;
+
+    (function loop() {
+      requestAnimationFrame(loop);
+      t += 0.005;
+      r.scene.rotation.z = t * 0.015;
+      pos.forEach(function (p, i) {
+        var s = 0.75 + 0.45 * Math.abs(Math.sin(t + phases[i]));
+        dummy.position.copy(p);
+        dummy.scale.setScalar(s);
+        dummy.updateMatrix();
+        nodes.setMatrixAt(i, dummy.matrix);
+      });
+      nodes.instanceMatrix.needsUpdate = true;
+      r.renderer.render(r.scene, r.camera);
+    })();
+  }
+
+  /* ──────────────────────────────────────────────────────────
+     9. PARALLAX ON HERO CONTENT
+  ────────────────────────────────────────────────────────── */
+  function initParallax() {
+    var content = document.querySelector('.hero-content');
+    if (!content) return;
+    var chips   = document.querySelectorAll('.chip');
+
+    window.addEventListener('scroll', function () {
+      var y = window.scrollY;
+      content.style.transform = 'translateY(' + y * 0.28 + 'px)';
+      content.style.opacity   = Math.max(0, 1 - y / 700).toFixed(3);
+      chips.forEach(function (c, i) {
+        var dir = i % 2 === 0 ? 1 : -1;
+        c.style.transform = 'translateY(' + y * 0.10 * dir + 'px)';
+      });
+    }, { passive: true });
+  }
+
+  /* ──────────────────────────────────────────────────────────
+     10. WORKSPACE CHAT SIMULATION
+  ────────────────────────────────────────────────────────── */
+  function initChat() {
+    var input    = document.getElementById('chat-input');
+    var sendBtn  = document.getElementById('chat-send');
+    var messages = document.getElementById('chat-messages');
+    if (!input || !sendBtn || !messages) return;
+
+    var responses = [
+      "DNS stands for Domain Name System — think of it as a phonebook for the internet. You type a name, it returns a number (IP address).",
+      "The TCP/IP model has 4 layers: Application, Transport, Internet, and Network Access. Each layer has a specific job in communication.",
+      "Encryption converts readable data into scrambled text using mathematical algorithms. Only the correct key can decode it back.",
+      "A firewall monitors and controls incoming and outgoing network traffic based on predefined security rules.",
+      "Great question! Subnetting divides a large network into smaller, more manageable sub-networks to improve performance and security.",
+      "I've processed your question. Let me break this down into the simplest possible terms for you..."
+    ];
+    var ri = 0;
+
+    function appendMsg(text, isUser) {
+      var div = document.createElement('div');
+      div.className = 'chat-msg ' + (isUser ? 'msg-user' : 'msg-ai');
+
+      if (!isUser) {
+        var ava = document.createElement('div');
+        ava.className = 'msg-ava';
+        ava.setAttribute('aria-hidden', 'true');
+        ava.textContent = '◎';
+        div.appendChild(ava);
+      }
+
+      var bubble = document.createElement('div');
+      bubble.className = 'msg-bubble';
+      bubble.textContent = text;
+      div.appendChild(bubble);
+
+      messages.appendChild(div);
+      messages.scrollTop = messages.scrollHeight;
+    }
+
+    function showTyping() {
+      var div = document.createElement('div');
+      div.className = 'chat-msg msg-ai';
+      div.id = 'typing-indicator';
+
+      var ava = document.createElement('div');
+      ava.className = 'msg-ava';
+      ava.setAttribute('aria-hidden', 'true');
+      ava.textContent = '◎';
+      div.appendChild(ava);
+
+      var bubble = document.createElement('div');
+      bubble.className = 'msg-bubble typing';
+      bubble.setAttribute('aria-label', 'AI is typing');
+      for (var i = 0; i < 3; i++) {
+        var dot = document.createElement('span');
+        dot.className = 'typing-dot';
+        dot.setAttribute('aria-hidden', 'true');
+        bubble.appendChild(dot);
+      }
+      div.appendChild(bubble);
+      messages.appendChild(div);
+      messages.scrollTop = messages.scrollHeight;
+    }
+
+    function removeTyping() {
+      var t = document.getElementById('typing-indicator');
+      if (t) t.remove();
+    }
+
+    function send() {
+      var text = input.value.trim();
+      if (!text) return;
+      appendMsg(text, true);
+      input.value = '';
+      sendBtn.disabled = true;
+
+      showTyping();
+      setTimeout(function () {
+        removeTyping();
+        appendMsg(responses[ri % responses.length], false);
+        ri++;
+        sendBtn.disabled = false;
+        input.focus();
+      }, 1600 + Math.random() * 600);
+    }
+
+    sendBtn.addEventListener('click', send);
+    input.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
+    });
+
+    // Copy button
+    var copyBtn = document.querySelector('.copy-btn');
+    if (copyBtn) {
+      copyBtn.addEventListener('click', function () {
+        var bodyEl = document.querySelector('.explain-body');
+        if (!bodyEl) return;
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(bodyEl.innerText).then(function () {
+            copyBtn.textContent = 'Copied!';
+            setTimeout(function () { copyBtn.textContent = 'Copy'; }, 1800);
+          });
+        } else {
+          copyBtn.textContent = 'Copied!';
+          setTimeout(function () { copyBtn.textContent = 'Copy'; }, 1800);
+        }
+      });
+    }
+  }
+
+  /* ──────────────────────────────────────────────────────────
+     11. UPLOAD ZONE
+  ────────────────────────────────────────────────────────── */
+  function initUpload() {
+    var zone = document.getElementById('upload-zone');
+    if (!zone) return;
+
+    function over(e) { e.preventDefault(); zone.classList.add('drag-over'); }
+    function out()   { zone.classList.remove('drag-over'); }
+    function drop(e) {
       e.preventDefault();
-      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      zone.classList.remove('drag-over');
+      var files = e.dataTransfer && e.dataTransfer.files;
+      if (files && files.length > 0) {
+        var icon = zone.querySelector('.uz-icon');
+        var p    = zone.querySelector('p');
+        if (icon) icon.textContent = '✓';
+        if (p)    p.innerHTML = '<span style="color:var(--accent-lt);font-weight:600">' +
+                                escapeHtml(files[0].name) + '</span> ready to analyse';
+      }
     }
-  });
-});
 
-/* =============================================
-   INTERSECTION OBSERVER FOR CANVAS LAZY INIT
-   ============================================= */
-// Observe canvas sections and trigger a resize/render when visible
-const canvasObserver = new IntersectionObserver(entries => {
-  entries.forEach(e => {
-    if (e.isIntersecting) {
-      window.dispatchEvent(new Event('resize'));
+    zone.addEventListener('dragenter', over);
+    zone.addEventListener('dragover',  over);
+    zone.addEventListener('dragleave', out);
+    zone.addEventListener('drop',      drop);
+    zone.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); zone.click(); }
+    });
+  }
+
+  function escapeHtml(str) {
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  /* ──────────────────────────────────────────────────────────
+     12. CARD GLOW FOLLOW
+  ────────────────────────────────────────────────────────── */
+  function initCardGlow() {
+    var cards = document.querySelectorAll('.glass-card, .impact-card, .service-item');
+    cards.forEach(function (card) {
+      card.addEventListener('mousemove', function (e) {
+        var rect = card.getBoundingClientRect();
+        var x = ((e.clientX - rect.left) / rect.width)  * 100;
+        var y = ((e.clientY - rect.top)  / rect.height) * 100;
+        card.style.background =
+          'radial-gradient(circle at ' + x + '% ' + y + '%, rgba(139,92,246,.07), var(--glass-bg) 55%)';
+      });
+      card.addEventListener('mouseleave', function () {
+        card.style.background = '';
+      });
+    });
+  }
+
+  /* ──────────────────────────────────────────────────────────
+     13. BOOKING MODAL
+  ────────────────────────────────────────────────────────── */
+  function initModal() {
+    var backdrop = document.getElementById('modal-backdrop');
+    var dialog   = document.getElementById('modal-dialog');
+    var closeBtn = document.getElementById('modal-close');
+    if (!backdrop || !dialog) return;
+
+    // All open triggers
+    document.querySelectorAll('.js-open-modal').forEach(function (el) {
+      el.addEventListener('click', openModal);
+    });
+    // Chip with role=button
+    document.querySelectorAll('[role="button"].js-open-modal, .chip-tr').forEach(function (el) {
+      el.addEventListener('click', openModal);
+      el.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openModal(); }
+      });
+    });
+
+    if (closeBtn)  closeBtn.addEventListener('click', closeModal);
+    backdrop.addEventListener('click', closeModal);
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && backdrop.classList.contains('open')) closeModal();
+    });
+
+    function openModal() {
+      backdrop.classList.add('open');
+      backdrop.setAttribute('aria-hidden', 'false');
+      dialog.classList.add('open');
+      dialog.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+      showPane(1);
+      resetModal();
     }
+
+    function closeModal() {
+      backdrop.classList.remove('open');
+      backdrop.setAttribute('aria-hidden', 'true');
+      dialog.classList.remove('open');
+      dialog.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+    }
+
+    // ── Step state ──
+    var selectedService = null;
+    var selectedDate    = null;
+    var selectedTime    = null;
+
+    // ── Pane switching ──
+    function showPane(n) {
+      ['1','2','3','confirm'].forEach(function (id) {
+        var p = document.getElementById('modal-pane-' + id);
+        if (p) p.classList.add('hidden');
+      });
+      var active = document.getElementById('modal-pane-' + n);
+      if (active) active.classList.remove('hidden');
+      updateStepBar(n);
+    }
+
+    function updateStepBar(step) {
+      var steps = document.querySelectorAll('.msb-step');
+      var lines = document.querySelectorAll('.msb-line');
+      var stepNum = parseInt(step) || 0;
+
+      steps.forEach(function (s) {
+        var n = parseInt(s.dataset.step);
+        s.classList.remove('active', 'done');
+        if (n < stepNum)      s.classList.add('done');
+        else if (n === stepNum) s.classList.add('active');
+      });
+      lines.forEach(function (l, i) {
+        l.classList.toggle('active', i + 1 < stepNum);
+      });
+    }
+
+    // ── Step 1: Services ──
+    var s1Next = document.getElementById('btn-step1-next');
+    document.querySelectorAll('.service-item').forEach(function (item) {
+      item.addEventListener('click', function () {
+        document.querySelectorAll('.service-item').forEach(function (i) { i.classList.remove('selected'); });
+        item.classList.add('selected');
+        selectedService = item.dataset.value;
+        if (s1Next) { s1Next.disabled = false; }
+      });
+    });
+    if (s1Next) {
+      s1Next.addEventListener('click', function () {
+        if (!selectedService) return;
+        showPane(2);
+        buildCalendar();
+      });
+    }
+
+    // ── Step 2: Calendar ──
+    var s2Next = document.getElementById('btn-step2-next');
+    var s2Back = document.getElementById('btn-step2-back');
+    if (s2Back) s2Back.addEventListener('click', function () { showPane(1); });
+
+    function buildCalendar() {
+      var wrap = document.getElementById('calendar-wrap');
+      if (!wrap) return;
+
+      var now   = new Date();
+      var year  = now.getFullYear();
+      var month = now.getMonth();
+      var today = now.getDate();
+
+      var MONTHS = ['January','February','March','April','May','June',
+                    'July','August','September','October','November','December'];
+      var DAYS   = ['Su','Mo','Tu','We','Th','Fr','Sa'];
+      var first  = new Date(year, month, 1).getDay();
+      var total  = new Date(year, month + 1, 0).getDate();
+
+      var html = '<div class="cal-header"><span>' + MONTHS[month] + ' ' + year + '</span></div>';
+      html += '<div class="cal-grid">';
+      DAYS.forEach(function (d) { html += '<div class="cal-dayname">' + d + '</div>'; });
+      for (var sp = 0; sp < first; sp++) html += '<div></div>';
+      for (var day = 1; day <= total; day++) {
+        var past    = day < today;
+        var isToday = day === today;
+        var cls     = 'cal-day' + (past ? ' disabled' : '') + (isToday ? ' today' : '');
+        html += '<div class="' + cls + '" data-day="' + day + '">' + day + '</div>';
+      }
+      html += '</div>';
+      wrap.innerHTML = html;
+
+      wrap.querySelectorAll('.cal-day:not(.disabled)').forEach(function (el) {
+        el.addEventListener('click', function () {
+          wrap.querySelectorAll('.cal-day').forEach(function (d) { d.classList.remove('selected'); });
+          el.classList.add('selected');
+          selectedDate = parseInt(el.dataset.day);
+          if (s2Next) s2Next.disabled = false;
+        });
+      });
+    }
+
+    if (s2Next) {
+      s2Next.addEventListener('click', function () {
+        if (!selectedDate) return;
+        var now   = new Date();
+        var SHORT_MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+        var SHORT_DAYS   = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+        var d = new Date(now.getFullYear(), now.getMonth(), selectedDate);
+        var lbl = document.getElementById('step3-date-label');
+        if (lbl) lbl.textContent = SHORT_DAYS[d.getDay()] + ', ' + SHORT_MONTHS[now.getMonth()] + ' ' + selectedDate;
+        showPane(3);
+      });
+    }
+
+    // ── Step 3: Time ──
+    var s3Confirm = document.getElementById('btn-step3-confirm');
+    var s3Back    = document.getElementById('btn-step3-back');
+    if (s3Back) s3Back.addEventListener('click', function () { showPane(2); });
+
+    document.querySelectorAll('.time-slot').forEach(function (slot) {
+      slot.addEventListener('click', function () {
+        document.querySelectorAll('.time-slot').forEach(function (s) { s.classList.remove('selected'); });
+        slot.classList.add('selected');
+        selectedTime = slot.querySelector('input') ? slot.querySelector('input').value : slot.textContent.trim();
+        if (s3Confirm) s3Confirm.disabled = false;
+      });
+    });
+
+    if (s3Confirm) {
+      s3Confirm.addEventListener('click', function () {
+        if (!selectedTime) return;
+        var names = { study: 'AI Study Session', concept: 'Concept Explanation', exam: 'Exam Preparation' };
+        var now   = new Date();
+        var SHORT_MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+        var dateStr = SHORT_MONTHS[now.getMonth()] + ' ' + selectedDate + ', ' + now.getFullYear();
+
+        var det = document.getElementById('confirm-details');
+        if (det) {
+          det.innerHTML =
+            '<dt>Service</dt><dd>' + (names[selectedService] || selectedService) + '</dd>' +
+            '<dt>Date</dt><dd>'    + dateStr   + '</dd>' +
+            '<dt>Time</dt><dd>'    + selectedTime + '</dd>';
+        }
+        showPane('confirm');
+        updateStepBar(4);
+      });
+    }
+
+    var doneBtn = document.getElementById('btn-done');
+    if (doneBtn) doneBtn.addEventListener('click', closeModal);
+
+    function resetModal() {
+      selectedService = null;
+      selectedDate    = null;
+      selectedTime    = null;
+      document.querySelectorAll('.service-item').forEach(function (i) { i.classList.remove('selected'); });
+      document.querySelectorAll('.time-slot').forEach(function (s) { s.classList.remove('selected'); });
+      if (s1Next)    s1Next.disabled    = true;
+      if (s2Next)    s2Next.disabled    = true;
+      if (s3Confirm) s3Confirm.disabled = true;
+    }
+  }
+
+  /* ──────────────────────────────────────────────────────────
+     14. SIDEBAR NAV (workspace)
+  ────────────────────────────────────────────────────────── */
+  function initSidebar() {
+    document.querySelectorAll('.wss-item').forEach(function (item) {
+      item.addEventListener('click', function () {
+        document.querySelectorAll('.wss-item').forEach(function (i) {
+          i.classList.remove('active');
+          i.removeAttribute('aria-current');
+        });
+        item.classList.add('active');
+        item.setAttribute('aria-current', 'page');
+      });
+    });
+  }
+
+  /* ──────────────────────────────────────────────────────────
+     BOOT
+  ────────────────────────────────────────────────────────── */
+  onReady(function () {
+    initCursor();
+    initNavbar();
+    initScrollReveal();
+    initTypewriter();
+    initParallax();
+    initChat();
+    initUpload();
+    initCardGlow();
+    initModal();
+    initSidebar();
+
+    // Three.js init waits for THREE to load from CDN
+    waitForThree(function () {
+      initHeroCanvas();
+      initMiniCanvas();
+      initGalaxy();
+      initVisionCanvas();
+    });
+
+    console.log('%c◎ Clarity Loop', 'font-size:18px;color:#8b5cf6;font-weight:bold;');
+    console.log('%cCinematic AI Learning Platform — loaded ✓', 'color:#a78bfa;');
   });
-}, { threshold: 0.1 });
 
-['galaxyCanvas', 'brainCanvas', 'visionCanvas'].forEach(id => {
-  const el = document.getElementById(id);
-  if (el) canvasObserver.observe(el);
-});
-
-/* =============================================
-   INIT COMPLETE
-   ============================================= */
-console.log('%c◎ Clarity Loop', 'font-size:20px;color:#8b5cf6;font-weight:bold;');
-console.log('%cCinematic AI Learning Platform', 'color:#a78bfa;');
+})();
