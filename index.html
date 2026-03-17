@@ -4,565 +4,476 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Clarity Loop — Understanding, Simplified by AI</title>
+  <meta name="description" content="Clarity Loop transforms lectures, documents, and videos into clear explanations using AI." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400;1,700&family=Sora:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400;1,700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
 
-  <!-- Custom Cursor -->
-  <div class="cursor" id="cursor"></div>
-  <div class="cursor-trail" id="cursorTrail"></div>
+  <!-- ░░ CURSOR ░░ -->
+  <div id="cl-cursor" aria-hidden="true"></div>
+  <div id="cl-cursor-ring" aria-hidden="true"></div>
 
-  <!-- ===== NAVBAR ===== -->
-  <nav class="navbar" id="navbar">
+  <!-- ░░ NAVBAR ░░ -->
+  <header class="navbar" id="navbar" role="banner">
     <div class="nav-inner">
-      <div class="nav-logo">
-        <span class="logo-mark">◎</span>
-        <span class="logo-text">Clarity Loop</span>
-      </div>
-      <div class="nav-links" id="navLinks">
-        <a href="#product" class="nav-link">Product</a>
-        <a href="#features" class="nav-link">Features</a>
-        <a href="#demo" class="nav-link">Demo</a>
-        <a href="#impact" class="nav-link">Impact</a>
-        <a href="#pricing" class="nav-link">Pricing</a>
-      </div>
+      <a href="#" class="nav-logo" aria-label="Clarity Loop Home">
+        <span class="logo-icon" aria-hidden="true">◎</span>
+        <span class="logo-name">Clarity Loop</span>
+      </a>
+      <nav class="nav-pill" id="navPill" aria-label="Main navigation">
+        <a href="#process"   class="nav-link">Product</a>
+        <a href="#galaxy"    class="nav-link">Features</a>
+        <a href="#workspace" class="nav-link">Demo</a>
+        <a href="#impact"    class="nav-link">Impact</a>
+        <a href="#vision"    class="nav-link">Pricing</a>
+      </nav>
       <div class="nav-right">
-        <button class="btn-cta" id="openModal">Get Early Access</button>
-        <button class="hamburger" id="hamburger" aria-label="Menu">
+        <button class="btn-cta js-open-modal" aria-haspopup="dialog">Get Early Access</button>
+        <button class="hamburger" id="hamburger" aria-label="Open menu" aria-expanded="false" aria-controls="navPill">
           <span></span><span></span><span></span>
         </button>
       </div>
     </div>
-  </nav>
+  </header>
 
-  <!-- ===== HERO SECTION ===== -->
-  <section class="hero" id="hero">
-    <canvas id="neuralCanvas"></canvas>
+  <!-- ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+       SECTION 1 — HERO
+  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ -->
+  <section class="s-hero" id="hero" aria-label="Hero">
+    <canvas id="canvas-hero" aria-hidden="true"></canvas>
+    <div class="hero-vignette" aria-hidden="true"></div>
 
     <!-- Floating Chips -->
-    <div class="chip chip-stats" data-reveal>
-      <span class="chip-dot"></span>
-      <span>120K+ learning sessions</span>
+    <div class="chip chip-tl" aria-label="Stats">
+      <span class="chip-pulse" aria-hidden="true"></span>
+      120K+ learning sessions
     </div>
-    <div class="chip chip-services" data-reveal>
-      <span>AI Notes &nbsp;·&nbsp; AI Tutor &nbsp;·&nbsp; Summaries</span>
+    <div class="chip chip-tr js-open-modal" role="button" tabindex="0" aria-haspopup="dialog" aria-label="Book AI Study Session">
+      <span class="chip-icon" aria-hidden="true">⚡</span>
+      Book AI Study Session
     </div>
-    <div class="chip chip-booking" data-reveal>
-      <button class="chip-btn" id="openModalChip">
-        <span class="chip-icon">⚡</span> Book AI Study Session
-      </button>
+    <div class="chip chip-bl" aria-label="Services">
+      AI Notes &nbsp;·&nbsp; AI Tutor &nbsp;·&nbsp; Summaries
     </div>
-    <div class="chip chip-search" data-reveal>
-      <span class="search-icon">⌕</span>
-      <span id="typewriterText" class="typewriter-text"></span>
-      <span class="typewriter-cursor">|</span>
+    <div class="chip chip-br chip-search" aria-label="Search preview">
+      <span class="chip-search-icon" aria-hidden="true">⌕</span>
+      <span id="typewriter-el" aria-live="polite"></span><span class="tw-cursor" aria-hidden="true">|</span>
     </div>
 
+    <!-- Hero Content -->
     <div class="hero-content">
-      <div class="hero-badge" data-reveal>
-        <span class="badge-pulse"></span>
+      <div class="hero-badge reveal-0">
+        <span class="badge-dot" aria-hidden="true"></span>
         AI-Powered Learning System
       </div>
-      <h1 class="hero-headline" data-reveal>
+      <h1 class="hero-h1 reveal-1">
         <em>Understanding.</em><br />
-        <span class="headline-plain">Simplified by</span>
-        <span class="headline-accent"> AI.</span>
+        <span>Simplified by AI.</span>
       </h1>
-      <p class="hero-sub" data-reveal>
+      <p class="hero-sub reveal-2">
         Upload lectures, documents, or videos.<br />
         Clarity Loop transforms them into clear explanations and notes.
       </p>
-      <div class="hero-actions" data-reveal>
-        <button class="btn-primary" id="openModalHero">
-          <span>Try the Prototype</span>
-          <span class="btn-glow"></span>
+      <div class="hero-actions reveal-3">
+        <button class="btn-primary js-open-modal">
+          Try the Prototype
+          <span class="btn-shine" aria-hidden="true"></span>
         </button>
-        <a href="#demo" class="btn-secondary">
-          <span class="btn-play">▶</span> See How It Works
+        <a href="#process" class="btn-ghost">
+          <span class="btn-play-icon" aria-hidden="true">▶</span>
+          See How It Works
         </a>
       </div>
     </div>
 
-    <div class="hero-scroll-hint">
-      <span>Scroll to explore</span>
-      <div class="scroll-line"></div>
+    <div class="hero-scroll-hint" aria-hidden="true">
+      <span>scroll</span>
+      <div class="scroll-track"><div class="scroll-dot"></div></div>
     </div>
   </section>
 
-  <!-- ===== AI BRAIN SECTION ===== -->
-  <section class="brain-section" id="product">
-    <div class="section-inner">
-      <div class="section-label" data-scroll-reveal>Neural Architecture</div>
-      <h2 class="section-title" data-scroll-reveal>
-        An AI that <em>thinks</em><br />the way you learn.
-      </h2>
-      <div class="brain-visual">
-        <canvas id="brainCanvas"></canvas>
-        <div class="brain-labels">
-          <div class="brain-label label-upload" data-scroll-reveal>
-            <span class="label-dot"></span>
-            <span>Upload Knowledge</span>
-          </div>
-          <div class="brain-label label-process" data-scroll-reveal>
-            <span class="label-dot"></span>
-            <span>AI Processing</span>
-          </div>
-          <div class="brain-label label-output" data-scroll-reveal>
-            <span class="label-dot"></span>
-            <span>Understanding Generated</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
+  <!-- ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+       SECTION 2 — HOW IT WORKS
+  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ -->
+  <section class="s-process" id="process" aria-label="How it works">
+    <div class="section-wrap">
+      <p class="section-eyebrow" data-sr>The Process</p>
+      <h2 class="section-h2" data-sr>Four steps from <em>complex</em><br />to crystal clear.</h2>
+      <div class="process-steps">
 
-  <!-- ===== CINEMATIC SCROLL SECTION ===== -->
-  <section class="cinematic-section" id="features">
-    <div class="cinematic-sticky">
-      <div class="cinematic-scenes">
-        <div class="scene scene-1 active" id="scene1">
-          <div class="scene-content">
-            <div class="scene-step">01</div>
-            <h3 class="scene-title">Complex material,<br /><em>simplified.</em></h3>
-            <p class="scene-desc">Feed any lecture, PDF, or video into Clarity Loop's neural engine.</p>
-            <div class="scene-visual input-visual">
-              <div class="doc-card glass-card">
-                <div class="doc-header">
-                  <div class="doc-icon">📄</div>
-                  <span>network_fundamentals.pdf</span>
-                  <span class="doc-size">2.4 MB</span>
-                </div>
-                <div class="doc-lines">
-                  <div class="doc-line long"></div>
-                  <div class="doc-line medium"></div>
-                  <div class="doc-line short"></div>
-                  <div class="doc-line long"></div>
-                  <div class="doc-line medium"></div>
-                </div>
+        <div class="process-step glass-card" data-sr>
+          <div class="step-num" aria-hidden="true">01</div>
+          <div class="step-icon" aria-hidden="true">📄</div>
+          <h3>Upload Your Material</h3>
+          <p>Drag in any lecture PDF, video, DOCX, or raw text. Our ingestion layer handles everything.</p>
+          <div class="step-preview upload-preview" aria-hidden="true">
+            <div class="upload-mock">
+              <div class="um-icon">⊕</div>
+              <div class="um-lines">
+                <div class="um-line w80"></div>
+                <div class="um-line w55"></div>
               </div>
             </div>
           </div>
         </div>
-        <div class="scene scene-2" id="scene2">
-          <div class="scene-content">
-            <div class="scene-step">02</div>
-            <h3 class="scene-title">Neural networks<br /><em>at work.</em></h3>
-            <p class="scene-desc">Advanced language models parse, connect, and understand the context deeply.</p>
-            <div class="scene-visual process-visual">
-              <canvas id="miniNeuralCanvas"></canvas>
-              <div class="process-labels">
-                <span class="process-tag">Parsing</span>
-                <span class="process-tag">Contextualizing</span>
-                <span class="process-tag">Synthesizing</span>
-              </div>
+
+        <div class="process-step glass-card" data-sr>
+          <div class="step-num" aria-hidden="true">02</div>
+          <div class="step-icon" aria-hidden="true">🧠</div>
+          <h3>Neural Processing</h3>
+          <p>Advanced language models parse context, identify key concepts, and build semantic connections.</p>
+          <div class="step-preview neural-preview" aria-hidden="true">
+            <canvas id="canvas-mini" width="200" height="90"></canvas>
+          </div>
+        </div>
+
+        <div class="process-step glass-card" data-sr>
+          <div class="step-num" aria-hidden="true">03</div>
+          <div class="step-icon" aria-hidden="true">💡</div>
+          <h3>Clear Explanations</h3>
+          <p>Get human-readable summaries crafted for your knowledge level — from beginner to expert.</p>
+          <div class="step-preview" aria-hidden="true">
+            <div class="explain-mock glass-card-inner">
+              <span class="em-badge">◎ AI</span>
+              <p>DNS is like a phone book for the internet — it translates names into addresses.</p>
             </div>
           </div>
         </div>
-        <div class="scene scene-3" id="scene3">
-          <div class="scene-content">
-            <div class="scene-step">03</div>
-            <h3 class="scene-title">Clear explanations,<br /><em>instantly.</em></h3>
-            <p class="scene-desc">Get human-readable summaries crafted for your level of understanding.</p>
-            <div class="scene-visual output-visual">
-              <div class="explanation-card glass-card">
-                <div class="explain-header">
-                  <span class="ai-badge">◎ AI Explanation</span>
-                </div>
-                <div class="explain-text">
-                  <p>DNS (Domain Name System) is like a phone book for the internet. When you type a website address, DNS translates it into a numerical IP address that computers use to find each other.</p>
-                </div>
-                <div class="explain-tags">
-                  <span class="tag">Networking</span>
-                  <span class="tag">DNS</span>
-                  <span class="tag">Protocols</span>
-                </div>
-              </div>
+
+        <div class="process-step glass-card" data-sr>
+          <div class="step-num" aria-hidden="true">04</div>
+          <div class="step-icon" aria-hidden="true">📝</div>
+          <h3>Notes &amp; Quizzes</h3>
+          <p>Structured study notes and exam-ready questions generated automatically from your material.</p>
+          <div class="step-preview" aria-hidden="true">
+            <div class="notes-mock">
+              <div class="nm-item"><span class="nm-dot">▸</span><span>DNS resolves names to IPs</span></div>
+              <div class="nm-item"><span class="nm-dot">▸</span><span>Uses UDP port 53</span></div>
+              <div class="nm-item"><span class="nm-dot">▸</span><span>Cached for speed</span></div>
             </div>
           </div>
         </div>
-        <div class="scene scene-4" id="scene4">
-          <div class="scene-content">
-            <div class="scene-step">04</div>
-            <h3 class="scene-title">Notes &amp; quizzes,<br /><em>auto-generated.</em></h3>
-            <p class="scene-desc">Structured notes and exam-ready questions built from your material.</p>
-            <div class="scene-visual notes-visual">
-              <div class="notes-card glass-card">
-                <div class="notes-header">📝 Smart Notes</div>
-                <div class="notes-item">
-                  <span class="notes-bullet">▸</span>
-                  <span>DNS resolves domain names to IP addresses</span>
-                </div>
-                <div class="notes-item">
-                  <span class="notes-bullet">▸</span>
-                  <span>Hierarchical structure: Root → TLD → Domain</span>
-                </div>
-                <div class="notes-item">
-                  <span class="notes-bullet">▸</span>
-                  <span>Uses UDP port 53 for queries</span>
-                </div>
-                <div class="quiz-preview">
-                  <span class="quiz-label">🎯 Quiz Ready</span>
-                  <span>3 questions generated</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="scene-progress">
-        <div class="progress-item active" data-scene="1"></div>
-        <div class="progress-item" data-scene="2"></div>
-        <div class="progress-item" data-scene="3"></div>
-        <div class="progress-item" data-scene="4"></div>
-      </div>
+
+      </div><!-- /process-steps -->
     </div>
-    <!-- Scroll spacer for cinematic effect -->
-    <div class="cinematic-spacer"></div>
   </section>
 
-  <!-- ===== KNOWLEDGE GALAXY ===== -->
-  <section class="galaxy-section" id="demo">
-    <div class="section-inner">
-      <div class="section-label" data-scroll-reveal>Interactive Knowledge Map</div>
-      <h2 class="section-title" data-scroll-reveal>
-        Your knowledge,<br /><em>visualized.</em>
-      </h2>
-      <p class="section-desc" data-scroll-reveal>
-        Every concept you learn becomes a node in your personal knowledge graph.
-        Hover to explore connections.
-      </p>
+  <!-- ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+       SECTION 3 — KNOWLEDGE GALAXY
+  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ -->
+  <section class="s-galaxy" id="galaxy" aria-label="Interactive knowledge galaxy">
+    <div class="section-wrap">
+      <p class="section-eyebrow" data-sr>Interactive Knowledge Map</p>
+      <h2 class="section-h2" data-sr>Your knowledge,<br /><em>visualized.</em></h2>
+      <p class="section-sub" data-sr>Every concept becomes a node in your personal knowledge graph. Hover to explore connections.</p>
     </div>
-    <div class="galaxy-container">
-      <canvas id="galaxyCanvas"></canvas>
-      <div class="galaxy-tooltip" id="galaxyTooltip">
-        <div class="tooltip-title"></div>
-        <div class="tooltip-desc"></div>
+    <div class="galaxy-wrap">
+      <canvas id="canvas-galaxy" aria-label="3D interactive knowledge galaxy" role="img"></canvas>
+      <div class="galaxy-tooltip" id="galaxy-tooltip" role="tooltip" aria-hidden="true">
+        <strong class="gt-name"></strong>
+        <span class="gt-desc"></span>
       </div>
     </div>
   </section>
 
-  <!-- ===== AI WORKSPACE ===== -->
-  <section class="workspace-section" id="workspace">
-    <div class="section-inner">
-      <div class="section-label" data-scroll-reveal>AI Workspace</div>
-      <h2 class="section-title" data-scroll-reveal>
-        Your intelligent<br /><em>study environment.</em>
-      </h2>
+  <!-- ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+       SECTION 4 — AI WORKSPACE
+  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ -->
+  <section class="s-workspace" id="workspace" aria-label="AI workspace preview">
+    <div class="section-wrap">
+      <p class="section-eyebrow" data-sr>AI Workspace</p>
+      <h2 class="section-h2" data-sr>Your intelligent<br /><em>study environment.</em></h2>
     </div>
-    <div class="workspace-preview" data-scroll-reveal>
-      <div class="workspace-sidebar">
-        <div class="sidebar-logo">◎ CL</div>
-        <nav class="sidebar-nav">
-          <a class="sidebar-item active" href="#">
-            <span class="si-icon">⊞</span>
-            <span class="si-text">Workspace</span>
-          </a>
-          <a class="sidebar-item" href="#">
-            <span class="si-icon">⊡</span>
-            <span class="si-text">Documents</span>
-          </a>
-          <a class="sidebar-item" href="#">
-            <span class="si-icon">◈</span>
-            <span class="si-text">Knowledge Graph</span>
-          </a>
-          <a class="sidebar-item" href="#">
-            <span class="si-icon">⟡</span>
-            <span class="si-text">AI Tutor</span>
-          </a>
-          <a class="sidebar-item" href="#">
-            <span class="si-icon">⚙</span>
-            <span class="si-text">Settings</span>
-          </a>
+
+    <div class="workspace-shell" data-sr aria-label="Workspace interface preview">
+      <!-- Sidebar -->
+      <aside class="ws-sidebar" aria-label="Workspace navigation">
+        <div class="wss-logo" aria-hidden="true">◎</div>
+        <nav class="wss-nav" aria-label="Sidebar navigation">
+          <button class="wss-item active" aria-current="page" aria-label="Workspace">
+            <span aria-hidden="true">⊞</span><em>Workspace</em>
+          </button>
+          <button class="wss-item" aria-label="Documents">
+            <span aria-hidden="true">⊡</span><em>Documents</em>
+          </button>
+          <button class="wss-item" aria-label="Knowledge Graph">
+            <span aria-hidden="true">◈</span><em>Graph</em>
+          </button>
+          <button class="wss-item" aria-label="AI Tutor">
+            <span aria-hidden="true">⟡</span><em>AI Tutor</em>
+          </button>
+          <button class="wss-item" aria-label="Settings">
+            <span aria-hidden="true">⚙</span><em>Settings</em>
+          </button>
         </nav>
-        <div class="sidebar-footer">
-          <div class="user-avatar">JD</div>
-        </div>
-      </div>
-      <div class="workspace-main">
-        <!-- Upload Card -->
-        <div class="ws-card upload-card glass-card">
-          <div class="upload-zone" id="uploadZone">
-            <div class="upload-icon">⊕</div>
-            <p>Drag &amp; drop files or <span class="upload-link">browse</span></p>
-            <span class="upload-hint">PDF, MP4, DOCX, TXT supported</span>
+        <div class="wss-avatar" aria-label="User avatar">JD</div>
+      </aside>
+
+      <!-- Main panels -->
+      <div class="ws-main">
+
+        <!-- Upload Panel -->
+        <div class="ws-panel upload-panel glass-card" aria-label="File upload">
+          <div class="ws-panel-head">
+            <span class="wph-title">Upload</span>
+          </div>
+          <div class="upload-zone" id="upload-zone" role="button" tabindex="0" aria-label="Drop files here or click to browse">
+            <div class="uz-icon" aria-hidden="true">⊕</div>
+            <p>Drag &amp; drop or <span class="uz-link">browse</span></p>
+            <small>PDF · MP4 · DOCX · TXT</small>
           </div>
         </div>
-        <!-- AI Chat -->
-        <div class="ws-card chat-card glass-card">
-          <div class="chat-header">
-            <span class="ai-dot"></span>
-            <span>AI Tutor</span>
-            <span class="chat-status">Online</span>
+
+        <!-- Chat Panel -->
+        <div class="ws-panel chat-panel glass-card" aria-label="AI Tutor chat">
+          <div class="ws-panel-head">
+            <span class="ai-status-dot" aria-hidden="true"></span>
+            <span class="wph-title">AI Tutor</span>
+            <span class="wph-badge">Online</span>
           </div>
-          <div class="chat-messages" id="chatMessages">
-            <div class="chat-msg ai-msg">
-              <div class="msg-avatar">◎</div>
-              <div class="msg-bubble">Hi! I've analyzed your document. What would you like to understand?</div>
-            </div>
-            <div class="chat-msg user-msg">
-              <div class="msg-bubble">Explain DNS in simple terms</div>
-            </div>
-            <div class="chat-msg ai-msg typing" id="typingMsg">
-              <div class="msg-avatar">◎</div>
-              <div class="msg-bubble">
-                <span class="typing-dot"></span>
-                <span class="typing-dot"></span>
-                <span class="typing-dot"></span>
-              </div>
+          <div class="chat-messages" id="chat-messages" aria-live="polite" aria-label="Chat conversation">
+            <div class="chat-msg msg-ai">
+              <div class="msg-ava" aria-hidden="true">◎</div>
+              <div class="msg-bubble">Hi! I've analysed your document. What would you like to understand?</div>
             </div>
           </div>
-          <div class="chat-input-area">
-            <input type="text" class="chat-input" placeholder="Ask anything about your documents…" id="chatInput" />
-            <button class="chat-send" id="chatSend">⮕</button>
+          <div class="chat-footer">
+            <input type="text" class="chat-input" id="chat-input" placeholder="Ask anything about your documents…" aria-label="Chat message input" autocomplete="off" />
+            <button class="chat-send" id="chat-send" aria-label="Send message">⮕</button>
           </div>
         </div>
-        <!-- Explanation Card -->
-        <div class="ws-card explain-card glass-card">
-          <div class="explain-card-header">
-            <span class="ai-badge">◎ AI Explanation</span>
-            <span class="explain-copy">Copy</span>
+
+        <!-- Explanation Panel -->
+        <div class="ws-panel explain-panel glass-card" aria-label="AI explanation">
+          <div class="ws-panel-head">
+            <span class="ai-badge-sm">◎ AI Explanation</span>
+            <button class="copy-btn" aria-label="Copy explanation">Copy</button>
           </div>
-          <p class="explain-body">DNS acts as the internet's directory service, translating human-readable domain names like <strong>google.com</strong> into machine-readable IP addresses like <strong>142.250.80.46</strong>.</p>
+          <p class="explain-body">
+            DNS (Domain Name System) acts as the internet's directory. It translates human-readable names like
+            <strong>google.com</strong> into machine-readable IP addresses like <strong>142.250.80.46</strong>.
+          </p>
           <div class="explain-tags">
             <span class="tag">Networking</span>
             <span class="tag">DNS</span>
             <span class="tag">Protocols</span>
           </div>
         </div>
-        <!-- Notes Card -->
-        <div class="ws-card notes-panel glass-card">
-          <div class="notes-panel-header">
-            <span>📝 Generated Notes</span>
-            <span class="notes-count">8 key points</span>
+
+        <!-- Notes Panel -->
+        <div class="ws-panel notes-panel glass-card" aria-label="Generated notes">
+          <div class="ws-panel-head">
+            <span class="wph-title">📝 Smart Notes</span>
+            <span class="wph-badge">8 points</span>
           </div>
-          <div class="notes-list">
-            <div class="note-item">
-              <span class="note-check">✓</span>
-              <span>DNS resolves domain names to IP addresses</span>
-            </div>
-            <div class="note-item">
-              <span class="note-check">✓</span>
-              <span>Hierarchical: Root → TLD → Domain → Subdomain</span>
-            </div>
-            <div class="note-item">
-              <span class="note-check">✓</span>
-              <span>Recursive vs Iterative queries</span>
-            </div>
-            <div class="note-item">
-              <span class="note-check">✓</span>
-              <span>Caching reduces lookup time</span>
-            </div>
-          </div>
-          <button class="notes-export">Export Notes</button>
+          <ul class="notes-list" aria-label="Key points">
+            <li><span class="nl-check" aria-hidden="true">✓</span>DNS resolves domain names to IP addresses</li>
+            <li><span class="nl-check" aria-hidden="true">✓</span>Hierarchy: Root → TLD → Domain → Subdomain</li>
+            <li><span class="nl-check" aria-hidden="true">✓</span>Recursive vs iterative query types</li>
+            <li><span class="nl-check" aria-hidden="true">✓</span>Caching dramatically reduces lookup time</li>
+          </ul>
+          <button class="btn-outline-sm">Export Notes</button>
         </div>
-      </div>
-    </div>
+
+      </div><!-- /ws-main -->
+    </div><!-- /workspace-shell -->
   </section>
 
-  <!-- ===== IMPACT SECTION ===== -->
-  <section class="impact-section" id="impact">
-    <div class="section-inner">
-      <div class="section-label" data-scroll-reveal>Who It's Built For</div>
-      <h2 class="section-title" data-scroll-reveal>
-        Learning that adapts<br /><em>to everyone.</em>
-      </h2>
+  <!-- ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+       SECTION 5 — IMPACT
+  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ -->
+  <section class="s-impact" id="impact" aria-label="Who it helps">
+    <div class="section-wrap">
+      <p class="section-eyebrow" data-sr>Who It's Built For</p>
+      <h2 class="section-h2" data-sr>Learning that adapts<br /><em>to everyone.</em></h2>
       <div class="impact-grid">
-        <div class="impact-card glass-card" data-scroll-reveal>
-          <div class="impact-icon">🌾</div>
+
+        <article class="impact-card glass-card" data-sr aria-label="Rural Students">
+          <div class="ic-icon" aria-hidden="true">🌾</div>
           <h3>Rural Students</h3>
-          <p>Access world-class AI tutoring without premium textbooks or expensive tutors. Learn at your own pace, in your own language.</p>
-          <div class="impact-stat">
-            <span class="stat-num">3.2M+</span>
-            <span class="stat-label">Underserved learners reached</span>
+          <p>World-class AI tutoring without expensive textbooks or private tutors. Learn at your pace, in your language.</p>
+          <div class="ic-stat">
+            <span class="ic-num">3.2M+</span>
+            <span class="ic-label">Underserved learners reached</span>
           </div>
-        </div>
-        <div class="impact-card glass-card featured" data-scroll-reveal>
-          <div class="impact-icon">💡</div>
+        </article>
+
+        <article class="impact-card glass-card featured" data-sr aria-label="Struggling Learners">
+          <div class="ic-icon" aria-hidden="true">💡</div>
           <h3>Struggling Learners</h3>
-          <p>Complex concepts broken down step by step. Never feel lost again — Clarity Loop finds the explanation that clicks for you.</p>
-          <div class="impact-stat">
-            <span class="stat-num">89%</span>
-            <span class="stat-label">Improvement in comprehension</span>
+          <p>Complex concepts broken down step by step. Clarity Loop finds the explanation that clicks for you specifically.</p>
+          <div class="ic-stat">
+            <span class="ic-num">89%</span>
+            <span class="ic-label">Improvement in comprehension</span>
           </div>
-        </div>
-        <div class="impact-card glass-card" data-scroll-reveal>
-          <div class="impact-icon">🚀</div>
+        </article>
+
+        <article class="impact-card glass-card" data-sr aria-label="Self Learners">
+          <div class="ic-icon" aria-hidden="true">🚀</div>
           <h3>Self Learners</h3>
-          <p>Supercharge your autodidactic journey. Turn any content into structured, retainable knowledge in minutes, not hours.</p>
-          <div class="impact-stat">
-            <span class="stat-num">10×</span>
-            <span class="stat-label">Faster knowledge retention</span>
+          <p>Supercharge your autodidactic journey. Turn any content into structured, retainable knowledge in minutes.</p>
+          <div class="ic-stat">
+            <span class="ic-num">10×</span>
+            <span class="ic-label">Faster knowledge retention</span>
           </div>
-        </div>
+        </article>
+
       </div>
     </div>
   </section>
 
-  <!-- ===== FINAL VISION ===== -->
-  <section class="vision-section" id="vision">
-    <canvas id="visionCanvas"></canvas>
-    <div class="vision-content">
-      <div class="section-label" data-scroll-reveal>Our Mission</div>
-      <h2 class="vision-headline" data-scroll-reveal>
+  <!-- ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+       SECTION 6 — VISION / CTA
+  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ -->
+  <section class="s-vision" id="vision" aria-label="Final call to action">
+    <canvas id="canvas-vision" aria-hidden="true"></canvas>
+    <div class="vision-inner">
+      <p class="section-eyebrow" data-sr>Our Mission</p>
+      <h2 class="vision-h2" data-sr>
         Education should adapt<br />
         <em>to students —</em><br />
         not the other way around.
       </h2>
-      <p class="vision-sub" data-scroll-reveal>
-        Join 120,000+ learners already transforming how they understand the world.
-      </p>
-      <div class="vision-actions" data-scroll-reveal>
-        <button class="btn-primary large" id="openModalVision">
-          <span>Join Waitlist</span>
-          <span class="btn-glow"></span>
+      <p class="section-sub vision-sub" data-sr>Join 120,000+ learners already transforming how they understand the world.</p>
+      <div class="vision-actions" data-sr>
+        <button class="btn-primary large js-open-modal">
+          Join Waitlist
+          <span class="btn-shine" aria-hidden="true"></span>
         </button>
-        <a href="#workspace" class="btn-secondary large">Explore the Prototype</a>
+        <a href="#workspace" class="btn-ghost large">Explore the Prototype</a>
       </div>
-      <div class="vision-stats">
-        <div class="v-stat" data-scroll-reveal>
-          <span class="v-num">120K+</span>
-          <span class="v-label">Active Learners</span>
+      <div class="vision-stats" aria-label="Key statistics">
+        <div class="vs-item" data-sr>
+          <strong>120K+</strong>
+          <span>Active Learners</span>
         </div>
-        <div class="v-divider"></div>
-        <div class="v-stat" data-scroll-reveal>
-          <span class="v-num">4.9★</span>
-          <span class="v-label">Average Rating</span>
+        <div class="vs-divider" aria-hidden="true"></div>
+        <div class="vs-item" data-sr>
+          <strong>4.9★</strong>
+          <span>Average Rating</span>
         </div>
-        <div class="v-divider"></div>
-        <div class="v-stat" data-scroll-reveal>
-          <span class="v-num">98%</span>
-          <span class="v-label">Say it changed how they learn</span>
+        <div class="vs-divider" aria-hidden="true"></div>
+        <div class="vs-item" data-sr>
+          <strong>98%</strong>
+          <span>Say it changed how they learn</span>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- ===== FOOTER ===== -->
-  <footer class="footer">
+  <!-- ░░ FOOTER ░░ -->
+  <footer class="site-footer" role="contentinfo">
     <div class="footer-inner">
       <div class="footer-logo">
-        <span class="logo-mark">◎</span>
-        <span class="logo-text">Clarity Loop</span>
+        <span class="logo-icon" aria-hidden="true">◎</span>
+        <span>Clarity Loop</span>
       </div>
-      <div class="footer-links">
+      <nav class="footer-links" aria-label="Footer links">
         <a href="#">Privacy</a>
         <a href="#">Terms</a>
         <a href="#">Contact</a>
         <a href="#">Blog</a>
-      </div>
+      </nav>
       <p class="footer-copy">© 2025 Clarity Loop. Redefining understanding.</p>
     </div>
   </footer>
 
-  <!-- ===== BOOKING MODAL ===== -->
-  <div class="modal-overlay" id="modalOverlay">
-    <div class="modal glass-card" id="modal">
-      <button class="modal-close" id="modalClose">✕</button>
+  <!-- ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+       BOOKING MODAL
+  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ -->
+  <div class="modal-backdrop" id="modal-backdrop" aria-hidden="true" role="presentation"></div>
+  <div class="modal-dialog" id="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="modal-title" aria-hidden="true">
+    <button class="modal-close" id="modal-close" aria-label="Close dialog">✕</button>
 
-      <!-- Step 1: Service Selection -->
-      <div class="modal-step" id="step1">
-        <div class="modal-header">
-          <div class="modal-step-indicator">
-            <span class="step-dot active"></span>
-            <span class="step-line"></span>
-            <span class="step-dot"></span>
-            <span class="step-line"></span>
-            <span class="step-dot"></span>
-          </div>
-          <h3 class="modal-title">Choose Your Session</h3>
-          <p class="modal-sub">What would you like help with today?</p>
-        </div>
-        <div class="service-options">
-          <div class="service-option" data-service="study">
-            <div class="service-icon">📚</div>
-            <div class="service-info">
-              <strong>AI Study Session</strong>
-              <span>Deep-dive into any subject with your AI tutor</span>
-            </div>
-            <div class="service-check">◉</div>
-          </div>
-          <div class="service-option" data-service="concept">
-            <div class="service-icon">💡</div>
-            <div class="service-info">
-              <strong>Concept Explanation</strong>
-              <span>Get a complex idea explained simply</span>
-            </div>
-            <div class="service-check">◉</div>
-          </div>
-          <div class="service-option" data-service="exam">
-            <div class="service-icon">🎯</div>
-            <div class="service-info">
-              <strong>Exam Preparation</strong>
-              <span>Practice questions and revision strategy</span>
-            </div>
-            <div class="service-check">◉</div>
-          </div>
-        </div>
-        <button class="btn-primary full-width" id="step1Next" disabled>Continue →</button>
+    <!-- Step indicator (shared) -->
+    <div class="modal-steps-bar" aria-label="Progress" id="steps-bar">
+      <span class="msb-step active" data-step="1">1</span>
+      <span class="msb-line" data-line="1"></span>
+      <span class="msb-step" data-step="2">2</span>
+      <span class="msb-line" data-line="2"></span>
+      <span class="msb-step" data-step="3">3</span>
+    </div>
+
+    <!-- Step 1 -->
+    <div class="modal-pane" id="modal-pane-1">
+      <h2 class="modal-title" id="modal-title">Choose Your Session</h2>
+      <p class="modal-desc">What would you like help with today?</p>
+      <div class="service-list" role="radiogroup" aria-label="Session type">
+        <label class="service-item" data-value="study">
+          <input type="radio" name="service" value="study" class="sr-only" />
+          <span class="si-icon" aria-hidden="true">📚</span>
+          <span class="si-text">
+            <strong>AI Study Session</strong>
+            <em>Deep-dive into any subject with your AI tutor</em>
+          </span>
+          <span class="si-radio" aria-hidden="true"></span>
+        </label>
+        <label class="service-item" data-value="concept">
+          <input type="radio" name="service" value="concept" class="sr-only" />
+          <span class="si-icon" aria-hidden="true">💡</span>
+          <span class="si-text">
+            <strong>Concept Explanation</strong>
+            <em>Get a complex idea explained simply</em>
+          </span>
+          <span class="si-radio" aria-hidden="true"></span>
+        </label>
+        <label class="service-item" data-value="exam">
+          <input type="radio" name="service" value="exam" class="sr-only" />
+          <span class="si-icon" aria-hidden="true">🎯</span>
+          <span class="si-text">
+            <strong>Exam Preparation</strong>
+            <em>Practice questions and revision strategy</em>
+          </span>
+          <span class="si-radio" aria-hidden="true"></span>
+        </label>
       </div>
+      <button class="btn-primary full" id="btn-step1-next" disabled>Continue →</button>
+    </div>
 
-      <!-- Step 2: Calendar -->
-      <div class="modal-step hidden" id="step2">
-        <div class="modal-header">
-          <div class="modal-step-indicator">
-            <span class="step-dot done">✓</span>
-            <span class="step-line active"></span>
-            <span class="step-dot active"></span>
-            <span class="step-line"></span>
-            <span class="step-dot"></span>
-          </div>
-          <h3 class="modal-title">Pick a Date</h3>
-          <p class="modal-sub">Available slots for the next 14 days</p>
-        </div>
-        <div class="calendar" id="calendar"></div>
-        <div class="modal-nav">
-          <button class="btn-secondary" id="step2Back">← Back</button>
-          <button class="btn-primary" id="step2Next" disabled>Continue →</button>
-        </div>
-      </div>
-
-      <!-- Step 3: Time Slots -->
-      <div class="modal-step hidden" id="step3">
-        <div class="modal-header">
-          <div class="modal-step-indicator">
-            <span class="step-dot done">✓</span>
-            <span class="step-line active"></span>
-            <span class="step-dot done">✓</span>
-            <span class="step-line active"></span>
-            <span class="step-dot active"></span>
-          </div>
-          <h3 class="modal-title">Choose a Time</h3>
-          <p class="modal-sub" id="selectedDateLabel">Select your preferred slot</p>
-        </div>
-        <div class="time-slots">
-          <div class="time-slot" data-time="10:00 AM">10:00 AM</div>
-          <div class="time-slot" data-time="12:30 PM">12:30 PM</div>
-          <div class="time-slot" data-time="3:00 PM">3:00 PM</div>
-          <div class="time-slot" data-time="6:30 PM">6:30 PM</div>
-        </div>
-        <div class="modal-nav">
-          <button class="btn-secondary" id="step3Back">← Back</button>
-          <button class="btn-primary" id="step3Confirm" disabled>Confirm Booking</button>
-        </div>
-      </div>
-
-      <!-- Confirmation -->
-      <div class="modal-step hidden" id="stepConfirm">
-        <div class="confirm-content">
-          <div class="confirm-icon">✦</div>
-          <h3 class="modal-title">You're booked!</h3>
-          <p class="modal-sub">Your AI session is confirmed.</p>
-          <div class="confirm-details" id="confirmDetails"></div>
-          <button class="btn-primary full-width" id="modalDone">Done</button>
-        </div>
+    <!-- Step 2 -->
+    <div class="modal-pane hidden" id="modal-pane-2">
+      <h2 class="modal-title">Pick a Date</h2>
+      <p class="modal-desc">Available slots for the next 14 days</p>
+      <div class="calendar-wrap" id="calendar-wrap" aria-label="Date picker"></div>
+      <div class="modal-nav">
+        <button class="btn-ghost" id="btn-step2-back">← Back</button>
+        <button class="btn-primary" id="btn-step2-next" disabled>Continue →</button>
       </div>
     </div>
-  </div>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-  <script src="script.js"></script>
+    <!-- Step 3 -->
+    <div class="modal-pane hidden" id="modal-pane-3">
+      <h2 class="modal-title">Choose a Time</h2>
+      <p class="modal-desc" id="step3-date-label">Select your preferred slot</p>
+      <div class="time-grid" role="radiogroup" aria-label="Time slots">
+        <label class="time-slot"><input type="radio" name="time" value="10:00 AM" class="sr-only" /><span>10:00 AM</span></label>
+        <label class="time-slot"><input type="radio" name="time" value="12:30 PM" class="sr-only" /><span>12:30 PM</span></label>
+        <label class="time-slot"><input type="radio" name="time" value="3:00 PM"  class="sr-only" /><span>3:00 PM</span></label>
+        <label class="time-slot"><input type="radio" name="time" value="6:30 PM"  class="sr-only" /><span>6:30 PM</span></label>
+      </div>
+      <div class="modal-nav">
+        <button class="btn-ghost" id="btn-step3-back">← Back</button>
+        <button class="btn-primary" id="btn-step3-confirm" disabled>Confirm Booking</button>
+      </div>
+    </div>
+
+    <!-- Confirmation -->
+    <div class="modal-pane hidden" id="modal-pane-confirm">
+      <div class="confirm-wrap">
+        <div class="confirm-star" aria-hidden="true">✦</div>
+        <h2 class="modal-title">You're booked!</h2>
+        <p class="modal-desc">Your AI session is confirmed.</p>
+        <dl class="confirm-details" id="confirm-details" aria-label="Booking details"></dl>
+        <button class="btn-primary full" id="btn-done">Done</button>
+      </div>
+    </div>
+  </div><!-- /modal-dialog -->
+
+  <!-- Three.js from CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" defer></script>
+  <script src="script.js" defer></script>
 </body>
 </html>
